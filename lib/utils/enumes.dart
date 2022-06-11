@@ -1,0 +1,1 @@
+enum HomeNavigation {myBooking,newBooking}
