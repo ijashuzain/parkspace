@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/screens/authentication/signup_page.dart';
 import 'package:parkspace/screens/home/home_main.dart';
 import 'package:parkspace/widgets/auth_title.dart';
 import 'package:parkspace/widgets/button.dart';
@@ -38,7 +39,7 @@ class LoginPage extends StatelessWidget {
               height: 5.h,
             ),
             SignupText(() {
-              //
+              Navigator.pushNamed(context, SignupPage.routeName);
             }),
             SizedBox(
               height: 1.h,

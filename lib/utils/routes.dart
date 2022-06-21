@@ -9,5 +9,5 @@ final Map<String, WidgetBuilder> routes = {
   StarterPage.routeName: (_) => const StarterPage(),
   HomePage.routeName: (_) => const HomePage(),
   LoginPage.routeName: (_) =>  LoginPage(),
-  SignupPage.routeName: (_) => const SignupPage()
+  SignupPage.routeName: (_) =>  SignupPage()
 };

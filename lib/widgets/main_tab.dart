@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/providers/home_provider.dart';
+import 'package:parkspace/utils/enumes.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class MainTabView extends StatefulWidget {
@@ -18,51 +21,48 @@ class MainTabView extends StatefulWidget {
 }
 
 class _MainTabViewState extends State<MainTabView> {
-  int selection = 0;
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 100.w,
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                selection = 0;
-              });
-              widget.onSelected(selection);
-            },
-            child: Text(
-              widget.firstOption,
-              style: TextStyle(
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.bold,
-                color: selection == 0 ? kPrimaryColor : kSecondaryColor,
-                fontSize: selection == 0 ? 22.sp : 14.sp,
+    return Consumer<HomeProvider>(
+      builder: (context, provider,child) {
+        return SizedBox(
+          width: 100.w,
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () {
+                  widget.onSelected(HomeNavigation.myBooking);
+                },
+                child: Text(
+                  widget.firstOption,
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                    color: provider.homeNavigation == HomeNavigation.myBooking ? kPrimaryColor : kSecondaryColor,
+                    fontSize: provider.homeNavigation == HomeNavigation.myBooking ? 22.sp : 14.sp,
+                  ),
+                ),
               ),
-            ),
+              const Spacer(),
+              GestureDetector(
+                onTap: () {
+                  widget.onSelected(HomeNavigation.newBooking);
+                },
+                child: Text(
+                  widget.secondOption,
+                  style: TextStyle(
+                    fontFamily: "Poppins",
+                    fontWeight: FontWeight.bold,
+                    color: provider.homeNavigation != HomeNavigation.newBooking ? kSecondaryColor : kPrimaryColor,
+                    fontSize: provider.homeNavigation != HomeNavigation.newBooking ? 14.sp : 22.sp,
+                  ),
+                ),
+              )
+            ],
           ),
-          const Spacer(),
-          GestureDetector(
-            onTap: () {
-              setState(() {
-                selection = 1;
-              });
-              widget.onSelected(selection);
-            },
-            child: Text(
-              widget.secondOption,
-              style: TextStyle(
-                fontFamily: "Poppins",
-                fontWeight: FontWeight.bold,
-                color: selection != 1 ? kSecondaryColor : kPrimaryColor,
-                fontSize: selection != 1 ? 14.sp : 22.sp,
-              ),
-            ),
-          )
-        ],
-      ),
+        );
+      }
     );
   }
 }

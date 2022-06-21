@@ -2,9 +2,13 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
-import 'package:parkspace/screens/home/home_bookings.dart';
+import 'package:parkspace/providers/home_provider.dart';
+import 'package:parkspace/screens/booking/my_bookings.dart';
+import 'package:parkspace/screens/booking/new_booking.dart';
+import 'package:parkspace/utils/enumes.dart';
 import 'package:parkspace/widgets/line_tab.dart';
 import 'package:parkspace/widgets/main_tab.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class HomePage extends StatelessWidget {
@@ -15,46 +19,44 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: kBackgroundColor,
-      body: Container(
-        height: 100.h,
-        width: 100.h,
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.all(3.h),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 3.h,
-                  ),
-                  const GreetingsWidget("Ijas Huzain"),
-                  SizedBox(
-                    height: 3.h,
-                  ),
-                  MainTabView(
-                    firstOption: "My Bookings",
-                    secondOption: "Book New",
-                    onSelected: (val) {
-                      if (val == 1) {}
-                    },
-                  ),
-                  SizedBox(
-                    height: 3.h,
-                  ),
-                  const HomeBookings()
-                ],
+      body: Consumer<HomeProvider>(builder: (context, provider, child) {
+        return SizedBox(
+          height: 100.h,
+          width: 100.h,
+          child: Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.all(3.h),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      height: 3.h,
+                    ),
+                    const GreetingsWidget("Administrator"),
+                    MainTabView(
+                      firstOption: "My Bookings",
+                      secondOption: "Book New",
+                      onSelected: (val) {
+                        provider.changeHomeNavigation(val);
+                      },
+                    ),
+                    SizedBox(
+                      height: 1.h,
+                    ),
+                    provider.homeNavigation == HomeNavigation.myBooking
+                        ? const HomeBookings()
+                        : const SizedBox()
+                  ],
+                ),
               ),
-            ),
-            Container(
-              height: 70.h,
-              width: 100.h,
-              color: kBackgroundColor,
-            )
-          ],
-        ),
-      ),
+              if (provider.homeNavigation == HomeNavigation.newBooking)
+                NewBooking()
+            ],
+          ),
+        );
+      }),
     );
   }
 }
@@ -83,7 +85,7 @@ class GreetingsWidget extends StatelessWidget {
             ),
           ),
           Text(
-            "Ijas Huzain",
+            name,
             style: TextStyle(
               fontFamily: "Poppins",
               fontWeight: FontWeight.bold,
