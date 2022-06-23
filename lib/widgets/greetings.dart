@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/screens/profile/profile_main.dart';
 import 'package:sizer/sizer.dart';
 
 class GreetingsWidget extends StatelessWidget {
   final String name;
+  final bool isProfile;
   const GreetingsWidget(
     this.name, {
     Key? key,
+    this.isProfile = false,
   }) : super(key: key);
 
   @override
@@ -37,10 +40,24 @@ class GreetingsWidget extends StatelessWidget {
               ),
             ),
           ),
-          const Align(
-            alignment: Alignment.centerRight,
-            child: Icon(Icons.person,color: kPrimaryColor,),
-          )
+          if (!isProfile)
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ProfileMain(),
+                    ),
+                  );
+                },
+                child: const Icon(
+                  Icons.person,
+                  color: kPrimaryColor,
+                ),
+              ),
+            )
         ],
       ),
     );
