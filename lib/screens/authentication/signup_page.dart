@@ -87,21 +87,28 @@ class SignupPage extends StatelessWidget {
                 ),
               ),
             ),
-            CTextField(
-              controller: nameController,
-              hint: "Name",
-            ),
-            CTextField(
-              controller: emailController,
-              hint: "Email",
-            ),
-            CTextField(
-              controller: phoneController,
-              hint: "Phone",
-            ),
-            CTextField(
-              controller: passwordController,
-              hint: "Password",
+            Padding(
+              padding:  EdgeInsets.only(left: 8.w,right: 8.w),
+              child: Column(
+                children: [
+                  CTextField(
+                    controller: nameController,
+                    hint: "Name",
+                  ),
+                  CTextField(
+                    controller: emailController,
+                    hint: "Email",
+                  ),
+                  CTextField(
+                    controller: phoneController,
+                    hint: "Phone",
+                  ),
+                  CTextField(
+                    controller: passwordController,
+                    hint: "Password",
+                  ),
+                ],
+              ),
             ),
             SizedBox(
               height: 5.h,

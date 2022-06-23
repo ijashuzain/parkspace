@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:parkspace/screens/authentication/login_page.dart';
 import 'package:parkspace/screens/authentication/signup_page.dart';
 import 'package:parkspace/screens/home/home_main.dart';
+import 'package:parkspace/screens/manager/manager_home.dart';
 import 'package:parkspace/starter.dart';
 
 final Map<String, WidgetBuilder> routes = {
@@ -9,5 +10,6 @@ final Map<String, WidgetBuilder> routes = {
   StarterPage.routeName: (_) => const StarterPage(),
   HomePage.routeName: (_) => const HomePage(),
   LoginPage.routeName: (_) =>  LoginPage(),
-  SignupPage.routeName: (_) =>  SignupPage()
+  SignupPage.routeName: (_) =>  SignupPage(),
+  ManagerHome.routeName: (_) => ManagerHome(),
 };

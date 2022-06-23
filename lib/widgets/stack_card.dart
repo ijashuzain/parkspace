@@ -18,7 +18,7 @@ class StackCard extends StatelessWidget {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Container(
-        height: 86.h,
+        height: 87.h,
         width: 100.w,
         decoration: BoxDecoration(
           color: kBackgroundColor,

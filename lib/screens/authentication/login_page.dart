@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
 import 'package:parkspace/screens/authentication/signup_page.dart';
 import 'package:parkspace/screens/home/home_main.dart';
+import 'package:parkspace/screens/manager/manager_home.dart';
 import 'package:parkspace/widgets/auth_title.dart';
 import 'package:parkspace/widgets/button.dart';
 import 'package:parkspace/widgets/text_field.dart';
@@ -27,13 +28,20 @@ class LoginPage extends StatelessWidget {
               height: 5.h,
             ),
             const AuthTitle("Login"),
-            CTextField(
-              controller: usernameController,
-              hint: "Username",
-            ),
-            CTextField(
-              controller: passwordController,
-              hint: "Password",
+            Padding(
+              padding:  EdgeInsets.only(left: 8.w,right: 8.w),
+              child: Column(
+                children: [
+                  CTextField(
+                    controller: usernameController,
+                    hint: "Username",
+                  ),
+                  CTextField(
+                    controller: passwordController,
+                    hint: "Password",
+                  ),
+                ],
+              ),
             ),
             SizedBox(
               height: 5.h,
@@ -47,7 +55,7 @@ class LoginPage extends StatelessWidget {
             CButton(
               title: "Login",
               onTap: () {
-                Navigator.pushNamed(context, HomePage.routeName);
+                Navigator.pushNamed(context, ManagerHome.routeName);
               },
             )
           ],

@@ -14,7 +14,7 @@ class CTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(left: 8.w, right: 8.w, top: 2.h,bottom: 2.h),
+      padding: EdgeInsets.only(top: 1.5.h,bottom: 1.5.h),
       child: TextFormField(
         controller: controller,
         decoration: InputDecoration(

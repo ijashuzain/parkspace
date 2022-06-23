@@ -1,1 +1,1 @@
-enum HomeNavigation {myBooking,newBooking}
+enum HomeNavigation {myBooking,newBooking,managerBookings,managerAreas}
