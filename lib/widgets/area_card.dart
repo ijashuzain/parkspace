@@ -5,22 +5,22 @@ import 'package:sizer/sizer.dart';
 class AreaCard extends StatelessWidget {
   final String name;
   final String address;
-  final String fromDate;
-  final String toDate;
-  final String fromTime;
-  final String toTime;
+  final bool nightParking;
+  final bool cameraStatus;
+  final int slots;
+  final int rate;
   final Color color;
   final VoidCallback onTap;
   const AreaCard({
     Key? key,
     required this.name,
     required this.address,
-    required this.fromDate,
-    required this.toDate,
-    required this.fromTime,
-    required this.toTime,
     required this.color,
     required this.onTap,
+    required this.nightParking,
+    required this.cameraStatus,
+    required this.slots,
+    required this.rate,
   }) : super(key: key);
 
   @override
@@ -33,9 +33,7 @@ class AreaCard extends StatelessWidget {
         },
         child: Container(
           width: 100.w,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2.h),
-              border: Border.all(color: kSecondaryColor)),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(2.h), border: Border.all(color: kSecondaryColor)),
           child: Row(
             children: [
               Container(
@@ -81,7 +79,7 @@ class AreaCard extends StatelessWidget {
                               ),
                               SizedBox(width: 1.w),
                               Text(
-                                "Night Parking Available",
+                                "Night Parking ${nightParking ? 'Available' : 'Not Available'}",
                                 style: TextStyle(
                                   fontFamily: "Poppins",
                                   fontSize: 9.sp,
@@ -101,7 +99,7 @@ class AreaCard extends StatelessWidget {
                               ),
                               SizedBox(width: 1.w),
                               Text(
-                                "Camera Available",
+                                "Camera ${cameraStatus ? 'Available' : 'Not Available'}",
                                 style: TextStyle(
                                   fontFamily: "Poppins",
                                   fontSize: 9.sp,
@@ -118,7 +116,7 @@ class AreaCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            "400/hr",
+                            "$rate/hr",
                             style: TextStyle(
                               fontFamily: "Poppins",
                               color: kPrimaryColor,
@@ -128,7 +126,7 @@ class AreaCard extends StatelessWidget {
                           ),
                           Spacer(),
                           Text(
-                            "20 Slots",
+                            "$slots Slots",
                             style: TextStyle(
                               fontFamily: "Poppins",
                               color: kPrimaryColor,

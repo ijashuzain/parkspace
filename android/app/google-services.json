@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "631391826676",
+    "project_id": "parkspace-b155d",
+    "storage_bucket": "parkspace-b155d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:631391826676:android:75ebf27179e1b41d7964a1",
+        "android_client_info": {
+          "package_name": "com.app.parkspace"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "631391826676-amn3cnanhgp75t5iq77o4tot0elma8ba.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCt4Sty0R2NF5rhBMsve_gQDC-5MbnYEk8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "631391826676-amn3cnanhgp75t5iq77o4tot0elma8ba.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

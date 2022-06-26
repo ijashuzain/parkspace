@@ -40,20 +40,17 @@ class HomePage extends StatelessWidget {
                       firstOption: "My Bookings",
                       secondOption: "Book New",
                       onSelected: (val) {
-                        provider.changeUserHomeNavigation(val);
+                        provider.changeUserHomeNavigation(context: context, homeNavigation: val);
                       },
                     ),
                     SizedBox(
                       height: 1.h,
                     ),
-                    provider.homeNavigation == HomeNavigation.myBooking
-                        ? const HomeBookings()
-                        : const SizedBox()
+                    provider.homeNavigation == HomeNavigation.myBooking ? const HomeBookings() : const SizedBox()
                   ],
                 ),
               ),
-              if (provider.homeNavigation == HomeNavigation.newBooking)
-                NewBooking()
+              if (provider.homeNavigation == HomeNavigation.newBooking) NewBooking()
             ],
           ),
         );

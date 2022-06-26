@@ -1,11 +1,16 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/providers/auth_provider.dart';
+import 'package:parkspace/providers/user_provider.dart';
 import 'package:parkspace/screens/authentication/signup_page.dart';
 import 'package:parkspace/screens/home/home_main.dart';
 import 'package:parkspace/screens/manager/manager_home.dart';
 import 'package:parkspace/widgets/auth_title.dart';
 import 'package:parkspace/widgets/button.dart';
 import 'package:parkspace/widgets/text_field.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class LoginPage extends StatelessWidget {
@@ -29,7 +34,7 @@ class LoginPage extends StatelessWidget {
             ),
             const AuthTitle("Login"),
             Padding(
-              padding:  EdgeInsets.only(left: 8.w,right: 8.w),
+              padding: EdgeInsets.only(left: 8.w, right: 8.w),
               child: Column(
                 children: [
                   CTextField(
@@ -52,12 +57,77 @@ class LoginPage extends StatelessWidget {
             SizedBox(
               height: 1.h,
             ),
-            CButton(
-              title: "Login",
-              onTap: () {
-                Navigator.pushNamed(context, ManagerHome.routeName);
-              },
-            )
+            Consumer<AuthProvider>(builder: (context, provider, child) {
+              return CButton(
+                isLoading: provider.loggingIn,
+                isDisabled: provider.loggingIn,
+                title: "Login",
+                onTap: () async {
+                  if (usernameController.text == '' || passwordController.text == '') {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(
+                          "Oops",
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                            color: kPrimaryColor,
+                            fontSize: 14.sp,
+                          ),
+                        ),
+                        content: Text(
+                          "Please fill all fields",
+                          style: TextStyle(
+                            fontFamily: "Poppins",
+                            color: kSecondaryColor,
+                            fontSize: 10.sp,
+                          ),
+                        ),
+                        actions: [
+                          FlatButton(
+                            child: const Text("OK"),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  } else {
+                    await provider.login(
+                      email: usernameController.text,
+                      password: passwordController.text,
+                      onSuccess: (val) async {
+                        await context.read<UserProvider>().fetchUser(
+                              userId: val,
+                              onSuccess: (val) async {
+                                if (val.type == "CUSTOMER") {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    HomePage.routeName,
+                                    ((route) => false),
+                                  );
+                                } else {
+                                  Navigator.pushNamedAndRemoveUntil(
+                                    context,
+                                    ManagerHome.routeName,
+                                    ((route) => false),
+                                  );
+                                }
+                              },
+                              onError: (val) {
+                                log(val);
+                              },
+                            );
+                      },
+                      onError: (val) {
+                        log(val);
+                      },
+                    );
+                  }
+                },
+              );
+            })
           ],
         ),
       ),
@@ -83,28 +153,15 @@ class SignupText extends StatelessWidget {
           children: [
             TextSpan(
               text: "Don't you have registered yet ? ",
-              style: TextStyle(
-                  fontFamily: "Poppins",
-                  fontSize: 8.sp,
-                  color: kPrimaryColor,
-                  fontWeight: FontWeight.w400),
+              style: TextStyle(fontFamily: "Poppins", fontSize: 8.sp, color: kPrimaryColor, fontWeight: FontWeight.w400),
             ),
             TextSpan(
               text: "Click here ",
-              style: TextStyle(
-                  fontFamily: "Poppins",
-                  fontSize: 8.sp,
-                  color: kSecondaryColor,
-                  fontWeight: FontWeight.w400,
-                  decoration: TextDecoration.underline),
+              style: TextStyle(fontFamily: "Poppins", fontSize: 8.sp, color: kSecondaryColor, fontWeight: FontWeight.w400, decoration: TextDecoration.underline),
             ),
             TextSpan(
               text: "to Signup now. ",
-              style: TextStyle(
-                  fontFamily: "Poppins",
-                  fontSize: 8.sp,
-                  color: kPrimaryColor,
-                  fontWeight: FontWeight.w400),
+              style: TextStyle(fontFamily: "Poppins", fontSize: 8.sp, color: kPrimaryColor, fontWeight: FontWeight.w400),
             ),
           ],
         ),

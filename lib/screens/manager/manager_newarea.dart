@@ -1,15 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/models/area_model.dart';
+import 'package:parkspace/providers/area_provider.dart';
+import 'package:parkspace/utils/globals.dart';
 import 'package:parkspace/widgets/button.dart';
 import 'package:parkspace/widgets/radio_field.dart';
 import 'package:parkspace/widgets/text_field.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class ManagerNewArea extends StatelessWidget {
-  ManagerNewArea({Key? key}) : super(key: key);
+  final LatLng location;
+
+  ManagerNewArea({Key? key, required this.location}) : super(key: key);
 
   TextEditingController nameController = TextEditingController();
-  TextEditingController locationController = TextEditingController();
+  TextEditingController addressController = TextEditingController();
   TextEditingController slotsController = TextEditingController();
   TextEditingController rateController = TextEditingController();
 
@@ -28,7 +35,7 @@ class ManagerNewArea extends StatelessWidget {
             hint: "Area Name",
           ),
           CTextField(
-            controller: locationController,
+            controller: addressController,
             hint: "Area Address",
           ),
           CTextField(
@@ -41,17 +48,56 @@ class ManagerNewArea extends StatelessWidget {
           ),
           CRadioField(
             title: "Camera Status",
-            onSelected: (val) {},
+            onSelected: (val) {
+              cameraStatus = val;
+            },
           ),
           CRadioField(
             title: "Night Parking",
-            onSelected: (val) {},
+            onSelected: (val) {
+              nightParking = val;
+            },
           ),
           const Spacer(),
-          CButton(
-            title: "Submit",
-            onTap: () {},
-          ),
+          Consumer<AreaProvider>(builder: (context, provider, child) {
+            return CButton(
+              isDisabled: provider.creatingArea,
+              isLoading: provider.creatingArea,
+              title: "Submit",
+              onTap: () async {
+                provider.createArea(
+                  context: context,
+                  area: Area(
+                    areaName: nameController.text,
+                    areaAddress: addressController.text,
+                    slots: int.parse(slotsController.text),
+                    cameraStatus: cameraStatus,
+                    nightParking: nightParking,
+                    bookedSlots: 0,
+                    latitude: location.latitude.toString(),
+                    longitude: location.longitude.toString(),
+                    rate: int.parse(rateController.text),
+                  ),
+                  onSuccess: (val) {
+                    Navigator.pop(context);
+                    Globals.showCustomDialog(
+                      context: context,
+                      title: "Success",
+                      content: "New area created successfully",
+                    );
+                  },
+                  onError: (val) {
+                    Navigator.pop(context);
+                    Globals.showCustomDialog(
+                      context: context,
+                      title: "Something went wrong",
+                      content: val,
+                    );
+                  },
+                );
+              },
+            );
+          }),
         ],
       ),
     );

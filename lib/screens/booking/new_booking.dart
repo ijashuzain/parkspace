@@ -1,16 +1,78 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/models/area_model.dart';
+import 'package:parkspace/models/map_marker_model.dart';
+import 'package:parkspace/providers/area_provider.dart';
+import 'package:parkspace/providers/booking_provider.dart';
 import 'package:parkspace/screens/booking/widgets/area_card_widget.dart';
 import 'package:parkspace/screens/booking/widgets/area_data_widget.dart';
 import 'package:parkspace/screens/booking/widgets/area_slot_selector.dart';
+import 'package:parkspace/screens/booking/widgets/booking_widget.dart';
 import 'package:parkspace/screens/payment/payment_main.dart';
+import 'package:parkspace/utils/globals.dart';
 import 'package:parkspace/widgets/button.dart';
 import 'package:parkspace/widgets/stack_card.dart';
 import "package:sizer/sizer.dart";
+import 'package:provider/provider.dart';
 
-class NewBooking extends StatelessWidget {
+import '../../models/booking_model.dart';
+import '../../providers/user_provider.dart';
+
+class NewBooking extends StatefulWidget {
   const NewBooking({Key? key}) : super(key: key);
+
+  @override
+  State<NewBooking> createState() => _NewBookingState();
+}
+
+class _NewBookingState extends State<NewBooking> {
+  //
+  Set<Marker> markers = {};
+
+  @override
+  void initState() {
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      List<MapMarker> mapMarkers = await context.read<AreaProvider>().getMarkers();
+      _getMarkers(mapMarkers);
+      log(mapMarkers.toString());
+    });
+    super.initState();
+  }
+
+  _getMarkers(List<MapMarker> mapMarkers) {
+    markers = {};
+    for (var element in mapMarkers) {
+      Marker marker = Marker(
+        markerId: element.marker.markerId,
+        position: element.marker.position,
+        icon: element.marker.icon,
+        onTap: () {
+          log("Marker Clicked");
+          _navigateToBooking(context: context, area: element.area);
+        },
+      );
+      markers.add(marker);
+    }
+    setState(() {});
+  }
+
+  _navigateToBooking({required BuildContext context, required Area area}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.transparent,
+      builder: (context) => StackCard(
+        title: area.areaName,
+        onClose: () {
+          Navigator.pop(context);
+        },
+        child: BookingWidget(area: area),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,64 +93,12 @@ class NewBooking extends StatelessWidget {
             ),
             child: Center(
               child: GestureDetector(
-                onTap: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    barrierColor: Colors.transparent,
-                    builder: (context) => StackCard(
-                      title: "CMS Parking Centre",
-                      onClose: () {
-                        Navigator.pop(context);
-                      },
-                      child: Column(
-                        children: [
-                          SizedBox(height: 2.h),
-                          const AreaDetailCard(
-                            availableSlots: "20",
-                            cameraStatus: true,
-                            location:
-                                "221b Baker St, London NW1 6XE, United Kingdom",
-                            nightParking: false,
-                            ratePerHour: "200",
-                          ),
-                          SizedBox(height: 2.h),
-                          const SlotSelector(),
-                          SizedBox(height: 2.h),
-                          const AreaDateTimePicker(),
-                          SizedBox(height: 2.h),
-                          CButton(
-                            title: "Pay",
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                backgroundColor: Colors.transparent,
-                                barrierColor: Colors.transparent,
-                                builder: (context) => StackCard(
-                                  child: const PaymentMain(),
-                                  title: "Payment",
-                                  onClose: () {
-                                    Navigator.pop(context);
-                                  },
-                                ),
-                              );
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                child:  Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: const [
-                    Icon(Icons.pin_drop),
-                    Text("Select Area From Map"),
-
-                  ],
+                onTap: () {},
+                child: GoogleMap(
+                  initialCameraPosition: const CameraPosition(
+                    target: LatLng(0, 0),
+                  ),
+                  markers: markers,
                 ),
               ),
             ),
@@ -99,66 +109,3 @@ class NewBooking extends StatelessWidget {
   }
 }
 
-class AreaDateTimePicker extends StatelessWidget {
-  const AreaDateTimePicker({
-    Key? key,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 100.w,
-      decoration: BoxDecoration(
-        color: Colors.grey[100],
-        borderRadius: const BorderRadius.all(
-          Radius.circular(24),
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          AreaData(
-            title: "From Date",
-            value: "14-09-1998",
-            width: 80.w,
-            isLeftAligned: false,
-            isCenterAligned: true,
-            onTap: () {
-              showDatePicker(
-                context: context,
-                initialDate: DateTime.now(),
-                firstDate: DateTime.now(),
-                lastDate: DateTime(2100),
-              );
-            },
-          ),
-          const Divider(color: kSecondaryColor),
-          Row(
-            children: [
-              AreaData(
-                title: "Parking Time",
-                value: "7:00 AM",
-                width: 35.w,
-                onTap: () {
-                  showTimePicker(
-                      context: context, initialTime: TimeOfDay.now());
-                },
-              ),
-              const VerticalDivider(color: kSecondaryColor),
-              AreaData(
-                title: "Pickup Time",
-                value: "9:00 PM",
-                width: 35.w,
-                isLeftAligned: false,
-                onTap: () {
-                  showTimePicker(
-                      context: context, initialTime: TimeOfDay.now());
-                },
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-}

@@ -1,17 +1,43 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/models/user_data.dart';
+import 'package:parkspace/providers/user_provider.dart';
 import 'package:parkspace/widgets/button.dart';
 import 'package:parkspace/widgets/greetings.dart';
 import 'package:parkspace/widgets/text_field.dart';
 import 'package:sizer/sizer.dart';
 
-class ProfileMain extends StatelessWidget {
+import '../../utils/globals.dart';
+import '../authentication/login_page.dart';
+import 'package:provider/provider.dart';
+
+class ProfileMain extends StatefulWidget {
   ProfileMain({Key? key}) : super(key: key);
 
+  @override
+  State<ProfileMain> createState() => _ProfileMainState();
+}
+
+class _ProfileMainState extends State<ProfileMain> {
   TextEditingController nameController = TextEditingController();
+
   TextEditingController emailController = TextEditingController();
+
   TextEditingController phoneController = TextEditingController();
+
   TextEditingController placeController = TextEditingController();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      UserData user = context.read<UserProvider>().currentUser!;
+      nameController.text = user.name;
+      emailController.text = user.email;
+      phoneController.text = user.phone;
+    });
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +85,7 @@ class ProfileMain extends StatelessWidget {
                     ],
                   ),
                 ),
+                SizedBox(height: 4.h),
                 CTextField(
                   controller: nameController,
                   hint: "Name",
@@ -71,18 +98,52 @@ class ProfileMain extends StatelessWidget {
                   controller: phoneController,
                   hint: "Phone",
                 ),
-                CTextField(
-                  controller: placeController,
-                  hint: "Place",
-                ),
                 SizedBox(height: 2.h),
-                CButton(
-                  title: "Update",
-                  onTap: () {},
-                ),
+                Consumer<UserProvider>(builder: (context, provider, child) {
+                  return CButton(
+                    isLoading: provider.updatingUser,
+                    isDisabled: provider.updatingUser,
+                    title: "Update",
+                    onTap: () {
+                      provider.updateUser(
+                        user: UserData(
+                          email: provider.currentUser!.email,
+                          name: nameController.text,
+                          phone: phoneController.text,
+                          type: provider.currentUser!.type,
+                          id: provider.currentUser!.id,
+                        ),
+                        onSuccess: (val) {
+                          Navigator.pop(context);
+                          Globals.showCustomDialog(
+                            context: context,
+                            title: "Success",
+                            content: val,
+                          );
+                        },
+                        onError: (val) {
+                          Navigator.pop(context);
+                          Globals.showCustomDialog(
+                            context: context,
+                            title: "Error",
+                            content: val,
+                          );
+                        },
+                      );
+                    },
+                  );
+                }),
                 SizedBox(height: 6.h),
                 InkWell(
-                  onTap: () {},
+                  onTap: () async {
+                    await FirebaseAuth.instance.signOut();
+                    Navigator.pushAndRemoveUntil(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => LoginPage(),
+                        ),
+                        (route) => false);
+                  },
                   child: SizedBox(
                     height: 5.h,
                     child: Row(

@@ -35,9 +35,7 @@ class BookingCard extends StatelessWidget {
         },
         child: Container(
           width: 100.w,
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(2.h),
-              border: Border.all(color: kSecondaryColor)),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(2.h), border: Border.all(color: kSecondaryColor)),
           child: Row(
             children: [
               Container(
@@ -53,13 +51,42 @@ class BookingCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                              fontFamily: "Poppins",
-                              color: kPrimaryColor,
-                              fontSize: 10.sp,
-                              fontWeight: FontWeight.w600,
+                          SizedBox(
+                            width: 80.w,
+                            child: Row(
+                              children: [
+                                Text(
+                                  title,
+                                  style: TextStyle(
+                                    fontFamily: "Poppins",
+                                    color: kPrimaryColor,
+                                    fontSize: 10.sp,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const Spacer(),
+                                Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[200],
+                                    borderRadius: BorderRadius.circular(1.w),
+                                    border: Border.all(
+                                      color: kPrimaryColor,
+                                    ),
+                                  ),
+                                  child: Padding(
+                                    padding: EdgeInsets.only(right: 2.w, left: 2.w),
+                                    child: Text(
+                                      status,
+                                      style: TextStyle(
+                                        fontFamily: "Poppins",
+                                        fontWeight: FontWeight.w400,
+                                        fontSize: 8.sp,
+                                        color: kPrimaryColor,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                           Text(

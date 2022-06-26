@@ -3,7 +3,9 @@ import 'package:parkspace/constants/colors.dart';
 import 'package:sizer/sizer.dart';
 
 class LineTabView extends StatefulWidget {
-  const LineTabView({Key? key}) : super(key: key);
+
+  final Function(int) onSelected;
+  const LineTabView({Key? key, required this.onSelected}) : super(key: key);
 
   @override
   State<LineTabView> createState() => _LineTabViewState();
@@ -11,6 +13,12 @@ class LineTabView extends StatefulWidget {
 
 class _LineTabViewState extends State<LineTabView> {
   int selection = 0;
+
+  @override
+  void initState() {
+    widget.onSelected(0);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +33,7 @@ class _LineTabViewState extends State<LineTabView> {
                   setState(() {
                     selection = 0;
                   });
+                  widget.onSelected(0);
                 },
                 child: SizedBox(
                   width: 20.w,
@@ -44,25 +53,7 @@ class _LineTabViewState extends State<LineTabView> {
                   setState(() {
                     selection = 1;
                   });
-                },
-                child: SizedBox(
-                  width: 25.w,
-                  child: Text(
-                    "Upcoming",
-                    style: TextStyle(
-                      fontFamily: "Poppins",
-                      fontWeight: selection == 1 ? FontWeight.w600 : FontWeight.w500,
-                      color: kPrimaryColor,
-                      fontSize: 10.sp,
-                    ),
-                  ),
-                ),
-              ),
-              GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selection = 2;
-                  });
+                  widget.onSelected(1);
                 },
                 child: SizedBox(
                   width: 10.w,
@@ -70,7 +61,7 @@ class _LineTabViewState extends State<LineTabView> {
                     "Past",
                     style: TextStyle(
                       fontFamily: "Poppins",
-                      fontWeight: selection == 2 ? FontWeight.w600 : FontWeight.w500,
+                      fontWeight: selection == 1 ? FontWeight.w600 : FontWeight.w500,
                       color: kPrimaryColor,
                       fontSize: 10.sp,
                     ),
@@ -97,16 +88,11 @@ class _LineTabViewState extends State<LineTabView> {
                     ),
                     SizedBox(width: 6.w,),
                     Container(
-                      width: 18.w,
+                      width: 8.w,
                       height: 0.3.h,
                       color: selection == 1 ? kPrimaryColor : Colors.transparent,
                     ),
                     SizedBox(width: 7.w,),
-                    Container(
-                      width: 8.w,
-                      height: 0.3.h,
-                      color: selection == 2 ? kPrimaryColor : Colors.transparent,
-                    )
                   ],
                 ),
               )
