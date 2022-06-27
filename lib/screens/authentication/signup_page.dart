@@ -5,6 +5,7 @@ import 'package:parkspace/constants/colors.dart';
 import 'package:parkspace/models/user_data.dart';
 import 'package:parkspace/providers/auth_provider.dart';
 import 'package:parkspace/providers/user_provider.dart';
+import 'package:parkspace/utils/globals.dart';
 import 'package:provider/provider.dart';
 import 'package:parkspace/screens/home/home_main.dart';
 import 'package:parkspace/widgets/auth_title.dart';
@@ -72,11 +73,9 @@ class _SignupPageState extends State<SignupPage> {
                             activeColor: kPrimaryColor,
                             value: 0,
                             groupValue: userType,
-                            onChanged: (val) {
-                              log(val.toString());
-                              setState(() {
-                                userType = int.parse(userType.toString());
-                              });
+                            onChanged: (int? val) {
+                              userType = val!;
+                              setState(() {});
                             },
                           ),
                           Text(
@@ -93,10 +92,9 @@ class _SignupPageState extends State<SignupPage> {
                             value: 1,
                             activeColor: kPrimaryColor,
                             groupValue: userType,
-                            onChanged: (val) {
-                              setState(() {
-                                userType = int.parse(userType.toString());
-                              });
+                            onChanged: (int? val) {
+                              userType = val!;
+                              setState(() {});
                             },
                           ),
                           Text(
@@ -145,12 +143,11 @@ class _SignupPageState extends State<SignupPage> {
               ),
               Consumer<AuthProvider>(builder: (context, provider, child) {
                 return CButton(
+                  isDisabled: provider.signingUp,
+                  isLoading: provider.signingUp,
                   title: "Signup",
                   onTap: () async {
-                    if (nameController.text == '' ||
-                        emailController.text == '' ||
-                        phoneController.text == '' ||
-                        passwordController.text == '') {
+                    if (nameController.text == '' || emailController.text == '' || phoneController.text == '' || passwordController.text == '') {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
@@ -195,6 +192,7 @@ class _SignupPageState extends State<SignupPage> {
                           await context.read<UserProvider>().fetchUser(
                                 userId: val,
                                 onSuccess: (val) async {
+
                                   Navigator.pushNamedAndRemoveUntil(
                                     context,
                                     HomePage.routeName,
@@ -202,11 +200,13 @@ class _SignupPageState extends State<SignupPage> {
                                   );
                                 },
                                 onError: (val) {
+
                                   log(val);
                                 },
                               );
                         },
                         onError: (val) {
+                          Globals.showCustomDialog(context: context, title: "Something went wrong", content: val);
                           log(val);
                         },
                       );

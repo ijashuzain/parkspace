@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/models/user_data.dart';
 import 'package:parkspace/providers/user_provider.dart';
 import 'package:parkspace/screens/authentication/login_page.dart';
 import 'package:parkspace/screens/home/home_main.dart';
 import 'package:parkspace/screens/manager/manager_home.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +24,10 @@ class StarterPage extends StatefulWidget {
 class _StarterPageState extends State<StarterPage> {
   @override
   void initState() {
-    _checkLogin(context);
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      await requestPermission();
+      await _checkLoggedIn(context);
+    });
     super.initState();
   }
 
@@ -60,6 +67,34 @@ class _StarterPageState extends State<StarterPage> {
     );
   }
 
+  requestPermission() async {
+    var status = await Permission.location.request();
+    if (status.isGranted) {
+      log("Permission granted");
+    } else if (status.isDenied) {
+      requestPermission();
+    }
+  }
+
+  _checkLoggedIn(BuildContext context) async {
+    UserProvider provider = context.read<UserProvider>();
+    bool res = await provider.checkLoggedIn();
+    if (res) {
+      UserData? user = provider.currentUser;
+      if (user != null) {
+        if (user.type == "CUSTOMER") {
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => HomePage()), (route) => false);
+        } else {
+          Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => ManagerHome()), (route) => false);
+        }
+      } else {
+        Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+      }
+    } else {
+      Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) => LoginPage()), (route) => false);
+    }
+  }
+
   _checkLogin(BuildContext context) async {
     FirebaseAuth.instance.authStateChanges().listen(
       (user) async {
@@ -74,7 +109,7 @@ class _StarterPageState extends State<StarterPage> {
                       context,
                       HomePage.routeName,
                     );
-                  } else {
+                  } else if (user.type == "ADMIN") {
                     Navigator.pushReplacementNamed(
                       context,
                       ManagerHome.routeName,

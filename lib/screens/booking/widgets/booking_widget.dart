@@ -20,11 +20,13 @@ class BookingWidget extends StatefulWidget {
   final Area area;
   final Booking? booking;
   final bool isEdit;
+  final bool isManage;
   BookingWidget({
     Key? key,
     required this.area,
     this.booking,
     this.isEdit = false,
+    this.isManage = false,
   }) : super(key: key);
 
   @override
@@ -41,7 +43,7 @@ class _BookingWidgetState extends State<BookingWidget> {
   @override
   void initState() {
     selectedSlots = 1;
-    if (widget.isEdit) {
+    if (widget.isEdit || widget.isManage) {
       selectedSlots = widget.booking!.slots;
       fromDate = widget.booking!.fromDate;
       fromTime = widget.booking!.fromTime;
@@ -98,47 +100,182 @@ class _BookingWidgetState extends State<BookingWidget> {
         ),
         SizedBox(height: 2.h),
         Consumer<BookingProvider>(builder: (context, provider, child) {
-          return widget.isEdit
-              ? Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    CButton(
-                      isDisabled: provider.updatingBooking,
-                      isLoading: provider.updatingBooking,
-                      title: "Update",
-                      onTap: () {
-                        provider.updateBooking(
-                          booking: Booking(
-                              status: BookingStatus.pending,
-                              fromDate: fromDate!,
-                              fromTime: fromTime!,
-                              toTime: toTime!,
-                              areaId: widget.booking!.area!.id!,
-                              uid: widget.booking!.uid,
-                              slots: selectedSlots!,
-                              id: widget.booking!.id),
-                          onSuccess: (val) {
-                            Navigator.pop(context);
-                            provider.fetchAllMyBookings(
-                              context: context,
-                              onError: (val) {},
-                              onSuccess: (val) {},
+          return widget.booking!.status == BookingStatus.pending
+              ? widget.isEdit
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        CButton(
+                          isDisabled: provider.updatingBooking,
+                          isLoading: provider.updatingBooking,
+                          title: "Update",
+                          onTap: () {
+                            provider.updateBooking(
+                              booking: Booking(
+                                  status: BookingStatus.pending,
+                                  fromDate: fromDate!,
+                                  fromTime: fromTime!,
+                                  toTime: toTime!,
+                                  areaId: widget.booking!.area!.id!,
+                                  uid: widget.booking!.uid,
+                                  slots: selectedSlots!,
+                                  id: widget.booking!.id),
+                              onSuccess: (val) {
+                                Navigator.pop(context);
+                                provider.fetchAllMyBookings(
+                                  context: context,
+                                  onError: (val) {},
+                                  onSuccess: (val) {},
+                                );
+                                Globals.showCustomDialog(context: context, title: "Success", content: "Booking updated success");
+                              },
+                              onError: (val) {
+                                Navigator.pop(context);
+                                provider.fetchAllMyBookings(
+                                  context: context,
+                                  onError: (val) {},
+                                  onSuccess: (val) {},
+                                );
+                                Globals.showCustomDialog(context: context, title: "Error", content: "Something went wrong");
+                              },
                             );
-                            Globals.showCustomDialog(context: context, title: "Success", content: "Booking updated success");
                           },
-                          onError: (val) {
-                            Navigator.pop(context);
-                            provider.fetchAllMyBookings(
-                              context: context,
-                              onError: (val) {},
-                              onSuccess: (val) {},
+                        ),
+                        CButton(
+                          isDisabled: provider.updatingBooking,
+                          isLoading: provider.updatingBooking,
+                          title: "Delete",
+                          onTap: () {
+                            provider.deleteBooking(
+                              bookingId: widget.booking!.id!,
+                              onSuccess: (val) {
+                                Navigator.pop(context);
+                                provider.fetchAllMyBookings(
+                                  context: context,
+                                  onError: (val) {},
+                                  onSuccess: (val) {},
+                                );
+                                Globals.showCustomDialog(context: context, title: "Success", content: "Booking deleted success");
+                              },
+                              onError: (val) {
+                                Navigator.pop(context);
+                                Globals.showCustomDialog(context: context, title: "Error", content: "Something went wrong");
+                              },
                             );
-                            Globals.showCustomDialog(context: context, title: "Error", content: "Something went wrong");
                           },
-                        );
-                      },
-                    ),
-                    CButton(
+                        ),
+                      ],
+                    )
+                  : widget.isManage
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            CButton(
+                              isDisabled: provider.updatingBooking,
+                              isLoading: provider.updatingBooking,
+                              title: "Accept",
+                              onTap: () {
+                                provider.updateBookingStatus(
+                                  bookingId: widget.booking!.id!,
+                                  bookingStatus: BookingStatus.confirmed,
+                                  onSuccess: (val) {
+                                    Navigator.pop(context);
+                                    provider.fetchAllManagerBookings(
+                                      context: context,
+                                      onError: (val) {},
+                                      onSuccess: (val) {},
+                                    );
+                                    Globals.showCustomDialog(context: context, title: "Success", content: "Booking updation has been successfully completed");
+                                  },
+                                  onError: (val) {
+                                    Navigator.pop(context);
+                                    provider.fetchAllMyBookings(
+                                      context: context,
+                                      onError: (val) {},
+                                      onSuccess: (val) {},
+                                    );
+                                    Globals.showCustomDialog(context: context, title: "Error", content: "Something went wrong");
+                                  },
+                                );
+                              },
+                            ),
+                            CButton(
+                              isDisabled: provider.updatingBooking,
+                              isLoading: provider.updatingBooking,
+                              title: "Reject",
+                              onTap: () {
+                                provider.updateBookingStatus(
+                                  bookingId: widget.booking!.id!,
+                                  bookingStatus: BookingStatus.rejected,
+                                  onSuccess: (val) {
+                                    Navigator.pop(context);
+                                    provider.fetchAllManagerBookings(
+                                      context: context,
+                                      onError: (val) {},
+                                      onSuccess: (val) {},
+                                    );
+                                    Globals.showCustomDialog(context: context, title: "Rejected", content: "Booking rejection has been successfully completed");
+                                  },
+                                  onError: (val) {
+                                    Navigator.pop(context);
+                                    Globals.showCustomDialog(context: context, title: "Error", content: "Something went wrong");
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        )
+                      : CButton(
+                          isLoading: provider.creatingBooking,
+                          isDisabled: provider.creatingBooking,
+                          title: "Book",
+                          onTap: () async {
+                            var userProvider = context.read<UserProvider>();
+                            var userId = userProvider.currentUser!.id;
+                            await provider.createBooking(
+                              booking: Booking(
+                                slots: selectedSlots!,
+                                uid: userId!,
+                                status: BookingStatus.pending,
+                                toTime: toTime!,
+                                fromTime: fromTime!,
+                                fromDate: fromDate!,
+                                areaId: widget.area.id!,
+                              ),
+                              onSuccess: (val) {
+                                Navigator.pop(context);
+                                Globals.showCustomDialog(
+                                  context: context,
+                                  title: "Success",
+                                  content: val,
+                                );
+                              },
+                              onError: (val) {
+                                Navigator.pop(context);
+                                Globals.showCustomDialog(
+                                  context: context,
+                                  title: "Something went wrong",
+                                  content: val,
+                                );
+                              },
+                            );
+                            // showModalBottomSheet(
+                            //   context: context,
+                            //   isScrollControlled: true,
+                            //   backgroundColor: Colors.transparent,
+                            //   barrierColor: Colors.transparent,
+                            //   builder: (context) => StackCard(
+                            //     child: const PaymentMain(),
+                            //     title: "Payment",
+                            //     onClose: () {
+                            //       Navigator.pop(context);
+                            //     },
+                            //   ),
+                            // );
+                          },
+                        )
+              : widget.isManage
+                  ? CButton(
                       isDisabled: provider.updatingBooking,
                       isLoading: provider.updatingBooking,
                       title: "Delete",
@@ -147,6 +284,11 @@ class _BookingWidgetState extends State<BookingWidget> {
                           bookingId: widget.booking!.id!,
                           onSuccess: (val) {
                             Navigator.pop(context);
+                            provider.fetchAllManagerBookings(
+                              context: context,
+                              onError: (val) {},
+                              onSuccess: (val) {},
+                            );
                             Globals.showCustomDialog(context: context, title: "Success", content: "Booking deleted success");
                           },
                           onError: (val) {
@@ -155,58 +297,8 @@ class _BookingWidgetState extends State<BookingWidget> {
                           },
                         );
                       },
-                    ),
-                  ],
-                )
-              : CButton(
-                  isLoading: provider.creatingBooking,
-                  isDisabled: provider.creatingBooking,
-                  title: "Book",
-                  onTap: () async {
-                    var userProvider = context.read<UserProvider>();
-                    var userId = userProvider.currentUser!.id;
-                    await provider.createBooking(
-                      booking: Booking(
-                        slots: selectedSlots!,
-                        uid: userId!,
-                        status: BookingStatus.pending,
-                        toTime: toTime!,
-                        fromTime: fromTime!,
-                        fromDate: fromDate!,
-                        areaId: widget.area.id!,
-                      ),
-                      onSuccess: (val) {
-                        Navigator.pop(context);
-                        Globals.showCustomDialog(
-                          context: context,
-                          title: "Success",
-                          content: val,
-                        );
-                      },
-                      onError: (val) {
-                        Navigator.pop(context);
-                        Globals.showCustomDialog(
-                          context: context,
-                          title: "Something went wrong",
-                          content: val,
-                        );
-                      },
-                    );
-                    // showModalBottomSheet(
-                    //   context: context,
-                    //   isScrollControlled: true,
-                    //   backgroundColor: Colors.transparent,
-                    //   barrierColor: Colors.transparent,
-                    //   builder: (context) => StackCard(
-                    //     child: const PaymentMain(),
-                    //     title: "Payment",
-                    //     onClose: () {
-                    //       Navigator.pop(context);
-                    //     },
-                    //   ),
-                    // );
-                  },
-                );
+                    )
+                  : const SizedBox();
         })
       ],
     );

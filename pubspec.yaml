@@ -44,6 +44,8 @@ dependencies:
   google_maps_flutter:
   location:
   permission_handler:
+  double_back_to_close_app: ^2.1.0
+  shared_preferences: 
 
 
 dev_dependencies:

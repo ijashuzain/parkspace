@@ -1,11 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parkspace/constants/colors.dart';
 import 'package:parkspace/providers/area_provider.dart';
 import 'package:parkspace/screens/manager/manager_newmap.dart';
 import 'package:parkspace/utils/globals.dart';
 import 'package:parkspace/widgets/area_card.dart';
 import 'package:provider/provider.dart';
+
+import 'manager_newarea.dart';
 
 class ManagerAreas extends StatefulWidget {
   const ManagerAreas({Key? key}) : super(key: key);
@@ -70,7 +73,20 @@ class _ManagerAreasState extends State<ManagerAreas> {
                     cameraStatus: provider.myAreas[index].cameraStatus,
                     nightParking: provider.myAreas[index].nightParking,
                     slots: provider.myAreas[index].slots,
-                    onTap: () {},
+                    onTap: () {
+                      Globals.showStackSheet(
+                        context: context,
+                        child: ManagerNewArea(
+                          isEdit: true,
+                          location: LatLng(
+                            double.parse(provider.myAreas[index].latitude),
+                            double.parse(provider.myAreas[index].longitude),
+                          ),
+                          area: provider.myAreas[index],
+                        ),
+                        title: "Update Parking Area",
+                      );
+                    },
                   );
                 },
               ),

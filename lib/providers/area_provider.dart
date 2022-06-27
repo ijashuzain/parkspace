@@ -37,6 +37,42 @@ class AreaProvider extends ChangeNotifier {
     }
   }
 
+  updateArea({
+    required BuildContext context,
+    required Area area,
+    required Function onSuccess,
+    required Function onError,
+  }) async {
+    _setCreatingArea(true);
+    try {
+      await db.collection("areas").doc(area.id).update(area.toMap());
+      onSuccess("Success");
+      _setCreatingArea(false);
+      await fetchAllMyAreas(context);
+    } catch (e) {
+      _setCreatingArea(false);
+      onError(e.toString());
+    }
+  }
+
+  deleteArea({
+    required BuildContext context,
+    required areaId,
+    required Function onSuccess,
+    required Function onError,
+  }) async {
+    _setCreatingArea(true);
+    try {
+      await db.collection("areas").doc(areaId).delete();
+      onSuccess("Success");
+      _setCreatingArea(false);
+      await fetchAllMyAreas(context);
+    } catch (e) {
+      _setCreatingArea(false);
+      onError(e.toString());
+    }
+  }
+
   Future<List<MapMarker>> getMarkers() async {
     try {
       var areaSnap = await db.collection("areas").get();

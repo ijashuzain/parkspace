@@ -35,7 +35,7 @@ class GreetingsWidget extends StatelessWidget {
               Positioned(
                 top: 2.h,
                 child: Text(
-                  provider.currentUser!.name,
+                  provider.currentUser == null ? 'Admin' : provider.currentUser!.name,
                   style: TextStyle(
                     fontFamily: "Poppins",
                     fontWeight: FontWeight.bold,

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:parkspace/models/user_data.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 class UserProvider extends ChangeNotifier {
@@ -19,6 +20,7 @@ class UserProvider extends ChangeNotifier {
     _setCreatingUser(true);
     try {
       await db.collection("users").doc(user.id).set(user.toMap());
+      await addToLocal(user.id!);
       _setCreatingUser(false);
       onSuccess("User has created successfully");
     } catch (e) {
@@ -44,6 +46,34 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
+  addToLocal(String userId) async {
+    SharedPreferences localdb = await SharedPreferences.getInstance();
+    localdb.setString('user', userId);
+    log("Added to local db");
+  }
+
+  Future<bool> checkLoggedIn() async {
+    log("Checking Loggin");
+    SharedPreferences localdb = await SharedPreferences.getInstance();
+    var result = localdb.get("user");
+    bool res = false;
+    log("Result : $result");
+    if (result != null) {
+      await fetchUser(
+        userId: result.toString(),
+        onSuccess: (val) {
+          res = true;
+        },
+        onError: (val) {
+          res = false;
+        },
+      );
+      return res;
+    } else {
+      return false;
+    }
+  }
+
   fetchUser({
     required String userId,
     required Function(UserData) onSuccess,
@@ -53,6 +83,7 @@ class UserProvider extends ChangeNotifier {
       var ref = await db.collection("users").doc(userId).get();
       if (ref.data() != null) {
         currentUser = UserData.fromJson(ref.data()!);
+        await addToLocal(userId);
         onSuccess(currentUser!);
       } else {
         currentUser = null;

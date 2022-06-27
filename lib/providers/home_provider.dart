@@ -12,21 +12,37 @@ class HomeProvider extends ChangeNotifier {
     this.homeNavigation = homeNavigation;
     notifyListeners();
 
-    if(homeNavigation == HomeNavigation.myBooking){
+    if (homeNavigation == HomeNavigation.myBooking) {
       context.read<BookingProvider>().fetchAllMyBookings(
-        context: context,
-        onSuccess: (val) {
-          log(val.toString());
-        },
-        onError: (val) {
-          log(val.toString());
-        },
-      );
+            context: context,
+            onSuccess: (val) {
+              log(val.toString());
+            },
+            onError: (val) {
+              log(val.toString());
+            },
+          );
+      notifyListeners();
     }
   }
 
-  void changeManagerHomeNavigation(HomeNavigation managerNav) {
+  void changeManagerHomeNavigation({
+    required BuildContext context,
+    required HomeNavigation managerNav,
+  }) async {
     managerNavigation = managerNav;
     notifyListeners();
+
+    if (managerNav == HomeNavigation.managerBookings) {
+      context.read<BookingProvider>().fetchAllManagerBookings(
+            context: context,
+            onSuccess: (val) {
+              log("Manager Booking Fetched");
+            },
+            onError: (val) {
+              log(val.toString());
+            },
+          );
+    }
   }
 }

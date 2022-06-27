@@ -5,11 +5,13 @@ import 'package:sizer/sizer.dart';
 class CRadioField extends StatefulWidget {
   final String title;
   final Function(bool) onSelected;
+  final bool value;
 
   const CRadioField({
     Key? key,
     required this.title,
     required this.onSelected,
+    required this.value,
   }) : super(key: key);
 
   @override
@@ -22,9 +24,9 @@ class _CRadioFieldState extends State<CRadioField> {
   @override
   void initState() {
     if (selected == 0) {
-      widget.onSelected(true);
+      widget.onSelected(widget.value);
     } else {
-      widget.onSelected(false);
+      widget.onSelected(widget.value);
     }
     super.initState();
   }

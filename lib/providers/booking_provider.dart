@@ -42,6 +42,26 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
+  updateBookingStatus({
+    required String bookingId,
+    required String bookingStatus,
+    required Function onSuccess,
+    required Function onError,
+  }) async {
+    _setUpdatingBooking(true);
+    try {
+      await db.collection('bookings').doc(bookingId).set({"status": bookingStatus},SetOptions(merge: true));
+      allMyBookings.clear();
+      currentBookings.clear();
+      pastBookings.clear();
+      _setUpdatingBooking(false);
+      onSuccess("Booking Updated successfully.");
+    } catch (e) {
+      _setUpdatingBooking(false);
+      onError("Updating error : ${e.toString()}");
+    }
+  }
+
   updateBooking({
     required Booking booking,
     required Function onSuccess,
@@ -50,7 +70,7 @@ class BookingProvider extends ChangeNotifier {
     _setUpdatingBooking(true);
     try {
       var id = booking.id;
-      await db.collection('bookings').doc(id).update(booking.toMap());
+      await db.collection('bookings').doc(id).set(booking.toMap(), SetOptions(merge: true));
       allMyBookings.clear();
       currentBookings.clear();
       pastBookings.clear();

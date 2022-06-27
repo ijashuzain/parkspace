@@ -6,6 +6,7 @@ import 'package:parkspace/providers/user_provider.dart';
 import 'package:parkspace/widgets/button.dart';
 import 'package:parkspace/widgets/greetings.dart';
 import 'package:parkspace/widgets/text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 
 import '../../utils/globals.dart';
@@ -137,6 +138,8 @@ class _ProfileMainState extends State<ProfileMain> {
                 InkWell(
                   onTap: () async {
                     await FirebaseAuth.instance.signOut();
+                    SharedPreferences localdb = await SharedPreferences.getInstance();
+                    localdb.clear();
                     Navigator.pushAndRemoveUntil(
                         context,
                         MaterialPageRoute(

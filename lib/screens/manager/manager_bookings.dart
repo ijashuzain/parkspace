@@ -9,6 +9,9 @@ import 'package:parkspace/widgets/booking_card.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
+import '../../widgets/stack_card.dart';
+import '../booking/widgets/booking_widget.dart';
+
 class ManagerBookings extends StatefulWidget {
   const ManagerBookings({Key? key}) : super(key: key);
 
@@ -19,17 +22,6 @@ class ManagerBookings extends StatefulWidget {
 class _ManagerBookingsState extends State<ManagerBookings> {
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
-      await context.read<BookingProvider>().fetchAllManagerBookings(
-            context: context,
-            onSuccess: (val) {
-              log("Manager Booking Fetched");
-            },
-            onError: (val) {
-              log(val.toString());
-            },
-          );
-    });
     super.initState();
   }
 
@@ -44,8 +36,24 @@ class _ManagerBookingsState extends State<ManagerBookings> {
         }
 
         if (provider.allManagerBookings.isEmpty) {
-          return const Center(
-            child: Text("No Bookings Found"),
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text("No bookings found. Try to refresh"),
+                IconButton(
+                  onPressed: () {
+                    provider.fetchAllManagerBookings(
+                      context: context,
+                      onSuccess: (val) {},
+                      onError: (val) {},
+                    );
+                  },
+                  icon: Icon(Icons.refresh),
+                ),
+              ],
+            ),
           );
         }
 
@@ -55,16 +63,33 @@ class _ManagerBookingsState extends State<ManagerBookings> {
             itemCount: provider.allManagerBookings.length,
             itemBuilder: (context, index) {
               return BookingCard(
-
-                title: provider.allMyBookings[index].user!.name,
-                subtitle: provider.allMyBookings[index].area!.areaName,
+                title: provider.allManagerBookings[index].user!.name,
+                subtitle: provider.allManagerBookings[index].area!.areaName,
                 color: Colors.red,
-                fromDate: provider.allMyBookings[index].fromDate,
-                toDate: provider.allMyBookings[index].fromDate,
-                fromTime: provider.allMyBookings[index].fromTime,
-                toTime: provider.allMyBookings[index].toTime,
-                status: provider.allMyBookings[index].status,
-                onTap: () {},
+                fromDate: provider.allManagerBookings[index].fromDate,
+                toDate: provider.allManagerBookings[index].fromDate,
+                fromTime: provider.allManagerBookings[index].fromTime,
+                toTime: provider.allManagerBookings[index].toTime,
+                status: provider.allManagerBookings[index].status,
+                onTap: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    barrierColor: Colors.transparent,
+                    builder: (context) => StackCard(
+                      child: BookingWidget(
+                        area: provider.allManagerBookings[index].area!,
+                        isManage: true,
+                        booking: provider.allManagerBookings[index],
+                      ),
+                      title: provider.allManagerBookings[index].area!.areaName,
+                      onClose: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  );
+                },
               );
             },
           ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:parkspace/models/user_data.dart';
 import 'package:parkspace/providers/user_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool loggingIn = false;

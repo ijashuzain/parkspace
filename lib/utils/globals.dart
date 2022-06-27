@@ -56,6 +56,44 @@ class Globals {
     );
   }
 
+  static  exitDialogue(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text(
+          "Exit",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontFamily: "Poppins",
+            color: kPrimaryColor,
+          ),
+        ),
+        content: const Text(
+          "Are you sure you want to close application.",
+          style: TextStyle(
+            fontWeight: FontWeight.w400,
+            fontFamily: "Poppins",
+            color: kSecondaryColor,
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("Yes"),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: const Text("No"),
+          )
+        ],
+      ),
+    );
+  }
+
   static String formatTimeOfDayToString(TimeOfDay tod) {
     final now = DateTime.now();
     final dt = DateTime(now.year, now.month, now.day, tod.hour, tod.minute);
