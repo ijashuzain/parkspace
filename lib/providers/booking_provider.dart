@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:parkspace/models/area_model.dart';
 import 'package:parkspace/providers/area_provider.dart';
+import 'package:parkspace/utils/globals.dart';
 import 'package:provider/provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -43,14 +44,15 @@ class BookingProvider extends ChangeNotifier {
   }
 
   updateBookingStatus({
-    required String bookingId,
+    required BuildContext context,
+    required Booking booking,
     required String bookingStatus,
     required Function onSuccess,
     required Function onError,
   }) async {
     _setUpdatingBooking(true);
     try {
-      await db.collection('bookings').doc(bookingId).set({"status": bookingStatus},SetOptions(merge: true));
+      await db.collection('bookings').doc(booking.id).set({"status": bookingStatus}, SetOptions(merge: true));
       allMyBookings.clear();
       currentBookings.clear();
       pastBookings.clear();
@@ -79,6 +81,25 @@ class BookingProvider extends ChangeNotifier {
     } catch (e) {
       _setUpdatingBooking(false);
       onError("Updating error : ${e.toString()}");
+    }
+  }
+
+  checkForCompletion(BuildContext context) async {
+    var res = await db.collection('bookings').where('status', isEqualTo: BookingStatus.confirmed).get();
+    for (var element in res.docs) {
+      Booking booking = Booking.fromJson(element.data());
+      DateTime date1 = Globals.formatStringToDateTime(booking.fromDate);
+      DateTime date2 = DateTime.now();
+      int difference = date2.difference(date1).inDays;
+      if (difference > 0) {
+        await updateBookingStatus(
+          context: context,
+          booking: booking,
+          bookingStatus: BookingStatus.completed,
+          onSuccess: (val) {},
+          onError: (val) {},
+        );
+      }
     }
   }
 

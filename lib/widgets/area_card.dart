@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:parkspace/constants/colors.dart';
+import 'package:parkspace/providers/area_provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:provider/provider.dart';
 
-class AreaCard extends StatelessWidget {
+class AreaCard extends StatefulWidget {
   final String name;
   final String address;
   final bool nightParking;
   final bool cameraStatus;
   final int slots;
+  final String areaId;
   final int rate;
   final Color color;
   final VoidCallback onTap;
@@ -21,7 +25,26 @@ class AreaCard extends StatelessWidget {
     required this.cameraStatus,
     required this.slots,
     required this.rate,
+    required this.areaId,
   }) : super(key: key);
+
+  @override
+  State<AreaCard> createState() => _AreaCardState();
+}
+
+class _AreaCardState extends State<AreaCard> {
+  int remainingSlots = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      int slots = await context.read<AreaProvider>().getBookedSlots(widget.areaId);
+      remainingSlots = widget.slots - slots;
+      if(!mounted) return;
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +52,7 @@ class AreaCard extends StatelessWidget {
       padding: EdgeInsets.only(bottom: 2.h),
       child: GestureDetector(
         onTap: () {
-          onTap();
+          widget.onTap();
         },
         child: Container(
           width: 100.w,
@@ -39,7 +62,7 @@ class AreaCard extends StatelessWidget {
               Container(
                 height: 6.h,
                 width: 0.5.w,
-                color: color,
+                color: widget.color,
               ),
               Padding(
                 padding: EdgeInsets.all(3.w),
@@ -52,7 +75,7 @@ class AreaCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            name,
+                            widget.name,
                             style: TextStyle(
                               fontFamily: "Poppins",
                               color: kPrimaryColor,
@@ -61,7 +84,7 @@ class AreaCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            address,
+                            widget.address,
                             style: TextStyle(
                               fontFamily: "Poppins",
                               fontSize: 9.sp,
@@ -79,7 +102,7 @@ class AreaCard extends StatelessWidget {
                               ),
                               SizedBox(width: 1.w),
                               Text(
-                                "Night Parking ${nightParking ? 'Available' : 'Not Available'}",
+                                "Night Parking ${widget.nightParking ? 'Available' : 'Not Available'}",
                                 style: TextStyle(
                                   fontFamily: "Poppins",
                                   fontSize: 9.sp,
@@ -99,7 +122,7 @@ class AreaCard extends StatelessWidget {
                               ),
                               SizedBox(width: 1.w),
                               Text(
-                                "Camera ${cameraStatus ? 'Available' : 'Not Available'}",
+                                "Camera ${widget.cameraStatus ? 'Available' : 'Not Available'}",
                                 style: TextStyle(
                                   fontFamily: "Poppins",
                                   fontSize: 9.sp,
@@ -116,7 +139,7 @@ class AreaCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            "$rate/hr",
+                            "${widget.rate}/hr",
                             style: TextStyle(
                               fontFamily: "Poppins",
                               color: kPrimaryColor,
@@ -126,11 +149,11 @@ class AreaCard extends StatelessWidget {
                           ),
                           Spacer(),
                           Text(
-                            "$slots Slots",
+                            "$remainingSlots Slots Left",
                             style: TextStyle(
                               fontFamily: "Poppins",
                               color: kPrimaryColor,
-                              fontSize: 12.sp,
+                              fontSize: 10.sp,
                               fontWeight: FontWeight.w600,
                             ),
                           ),

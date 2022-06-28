@@ -8,11 +8,12 @@ class HomeProvider extends ChangeNotifier {
   HomeNavigation homeNavigation = HomeNavigation.myBooking;
   HomeNavigation managerNavigation = HomeNavigation.managerBookings;
 
-  void changeUserHomeNavigation({required BuildContext context, required HomeNavigation homeNavigation}) {
+  void changeUserHomeNavigation({required BuildContext context, required HomeNavigation homeNavigation}) async {
     this.homeNavigation = homeNavigation;
     notifyListeners();
 
     if (homeNavigation == HomeNavigation.myBooking) {
+      await context.read<BookingProvider>().checkForCompletion(context);
       context.read<BookingProvider>().fetchAllMyBookings(
             context: context,
             onSuccess: (val) {
@@ -34,6 +35,7 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
 
     if (managerNav == HomeNavigation.managerBookings) {
+      await context.read<BookingProvider>().checkForCompletion(context);
       context.read<BookingProvider>().fetchAllManagerBookings(
             context: context,
             onSuccess: (val) {

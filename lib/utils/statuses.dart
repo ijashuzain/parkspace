@@ -1,5 +1,6 @@
 class BookingStatus {
-  static String parked = "PARKED";
-  static String booked = "BOOKED";
+  static String confirmed = "CONFIRMED";
   static String completed = "COMPLETED";
+  static String pending = "PENDING";
+  static String rejected = "REJECTED";
 }

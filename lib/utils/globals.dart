@@ -116,9 +116,3 @@ class Globals {
   }
 
 }
-
-class BookingStatus {
-  static String pending = "PENDING";
-  static String confirmed = "CONFIRMED";
-  static String rejected = "REJECTED";
-}

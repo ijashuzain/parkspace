@@ -8,6 +8,7 @@ import 'package:parkspace/utils/globals.dart';
 import 'package:parkspace/widgets/area_card.dart';
 import 'package:provider/provider.dart';
 
+import '../../providers/booking_provider.dart';
 import 'manager_newarea.dart';
 
 class ManagerAreas extends StatefulWidget {
@@ -66,13 +67,14 @@ class _ManagerAreasState extends State<ManagerAreas> {
                 itemCount: provider.myAreas.length,
                 itemBuilder: (context, index) {
                   return AreaCard(
+                    areaId: provider.myAreas[index].id!,
                     name: provider.myAreas[index].areaName,
                     address: provider.myAreas[index].areaAddress,
                     color: Colors.green,
                     rate: provider.myAreas[index].rate,
                     cameraStatus: provider.myAreas[index].cameraStatus,
                     nightParking: provider.myAreas[index].nightParking,
-                    slots: provider.myAreas[index].slots,
+                    slots: provider.myAreas[index].slots ,
                     onTap: () {
                       Globals.showStackSheet(
                         context: context,

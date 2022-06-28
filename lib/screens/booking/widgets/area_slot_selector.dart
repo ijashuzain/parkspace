@@ -6,11 +6,14 @@ class SlotSelector extends StatefulWidget {
   final int selectedSlotValue;
   final int totalSlots;
   final Function onSelected;
+  final bool locked;
+  final List<DropdownMenuItem<int>> menuList;
   const SlotSelector({
     Key? key,
     required this.selectedSlotValue,
     required this.totalSlots,
     required this.onSelected,
+    required this.locked, required this.menuList,
   }) : super(key: key);
 
   @override
@@ -20,23 +23,7 @@ class SlotSelector extends StatefulWidget {
 class _SlotSelectorState extends State<SlotSelector> {
   @override
   void initState() {
-    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
-      _generateSlotsMenu(widget.totalSlots);
-    });
     super.initState();
-  }
-
-  List<DropdownMenuItem<int>> menusList = [];
-
-  _generateSlotsMenu(int totalSlots) {
-    menusList = [];
-    for (var i = 1; i <= totalSlots; i++) {
-      menusList.add(DropdownMenuItem(
-        child: Text(i.toString()),
-        value: i,
-      ));
-    }
-    setState(() {});
   }
 
   @override
@@ -65,13 +52,13 @@ class _SlotSelectorState extends State<SlotSelector> {
                 fontWeight: FontWeight.w500,
               ),
             ),
-            DropdownButton(
+            DropdownButton<int>(
               isExpanded: true,
-              hint: const Text("Select Slots"),
+              hint:  Text(widget.locked ? "There is no slots left" : "Select Slots"),
               borderRadius: const BorderRadius.all(Radius.circular(12)),
               underline: const SizedBox(),
-              value: widget.selectedSlotValue,
-              items: menusList,
+              value: widget.locked ? null : widget.selectedSlotValue,
+              items: widget.locked ? [] : widget.menuList,
               onChanged: (val) {
                 widget.onSelected(int.parse(val.toString()));
               },

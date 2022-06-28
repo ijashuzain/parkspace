@@ -1,5 +1,4 @@
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
 import 'package:parkspace/providers/home_provider.dart';

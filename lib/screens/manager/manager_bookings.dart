@@ -41,7 +41,7 @@ class _ManagerBookingsState extends State<ManagerBookings> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text("No bookings found. Try to refresh"),
+                const Text("No bookings found. Try to refresh"),
                 IconButton(
                   onPressed: () {
                     provider.fetchAllManagerBookings(

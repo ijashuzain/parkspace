@@ -34,6 +34,7 @@ class _NewBookingState extends State<NewBooking> {
   @override
   void initState() {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      await context.read<BookingProvider>().checkForCompletion(context);
       List<MapMarker> mapMarkers = await context.read<AreaProvider>().getMarkers();
       _getMarkers(mapMarkers);
       log(mapMarkers.toString());

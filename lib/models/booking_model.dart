@@ -33,9 +33,9 @@ class Booking {
         uid = json['uid'],
         areaId = json['areaId'],
         id = json['id'],
-        area = Area.fromJson(json['area']),
+        area = json['area'] != null ? Area.fromJson(json['area']) : null,
         slots = json['slots'],
-        user = UserData.fromJson(json['user']),
+        user = json['user'] != null ? UserData.fromJson(json['user']) : null,
         status = json['status'];
 
   Map<String, dynamic> toMap() {

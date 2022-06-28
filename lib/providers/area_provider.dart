@@ -1,9 +1,13 @@
+import 'dart:developer';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parkspace/models/area_model.dart';
+import 'package:parkspace/models/booking_model.dart';
 import 'package:parkspace/models/map_marker_model.dart';
 import 'package:parkspace/providers/user_provider.dart';
+import 'package:parkspace/utils/statuses.dart';
 import 'package:provider/provider.dart';
 
 class AreaProvider extends ChangeNotifier {
@@ -35,6 +39,26 @@ class AreaProvider extends ChangeNotifier {
       _setCreatingArea(false);
       onError(e.toString());
     }
+  }
+
+  updateSlotArea({required String areaId,required int bookedSlots}) async {
+    try{
+      await db.collection("areas").doc(areaId).set({"bookedSlots" : bookedSlots},SetOptions(merge: true));
+    }catch (e){
+      log("Error while updating slot : $e");
+    }
+  }
+  
+  Future<int> getBookedSlots(String areaId) async {
+    var res = await db.collection('bookings').where('areaId',isEqualTo: areaId).where('status',isEqualTo: BookingStatus.confirmed).get();
+    int bookedSlots = 0;
+    if(res.docs.isNotEmpty){
+      for (var element in res.docs) { 
+        Booking booking = Booking.fromJson(element.data());
+        bookedSlots = bookedSlots + booking.slots;
+      }
+    }
+    return bookedSlots;
   }
 
   updateArea({
