@@ -3,6 +3,8 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:parkspace/models/area_model.dart';
 import 'package:parkspace/providers/area_provider.dart';
+import 'package:parkspace/screens/payment/payment_main.dart';
+import 'package:parkspace/widgets/stack_card.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
@@ -53,7 +55,8 @@ class _BookingWidgetState extends State<BookingWidget> {
     }
 
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
-      int slots = await context.read<AreaProvider>().getBookedSlots(widget.area.id!);
+      int slots =
+          await context.read<AreaProvider>().getBookedSlots(widget.area.id!);
       slotCount = slots;
       if (slotCount >= widget.area.slots) {
         locked = true;
@@ -237,56 +240,74 @@ class _BookingWidgetState extends State<BookingWidget> {
           );
         } else {
           if (fromTime != null || toTime != null || fromDate != null) {
-            var userProvider = context.read<UserProvider>();
-            var userId = userProvider.currentUser!.id;
-            await provider.createBooking(
-              booking: Booking(
-                slots: selectedSlots!,
-                uid: userId!,
-                status: BookingStatus.pending,
-                toTime: toTime!,
-                fromTime: fromTime!,
-                fromDate: fromDate!,
-                areaId: widget.area.id!,
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,
+              backgroundColor: Colors.transparent,
+              barrierColor: Colors.transparent,
+              builder: (context) => StackCard(
+                title: "Payment",
+                onClose: () {
+                  Navigator.pop(context);
+                },
+                child: PaymentMain(
+                  amount: 1000,
+                  product: widget.area.areaName,
+                  onSuccess: () async {
+                    Navigator.pop(context);
+                    _createBooking(provider);
+                  },
+                  onError: () {
+                    Globals.showCustomDialog(
+                      context: context,
+                      title: "Payment Failed",
+                      content: "Something went wrong while paying",
+                    );
+                  },
+                ),
               ),
-              onSuccess: (val) {
-                Navigator.pop(context);
-                Globals.showCustomDialog(
-                  context: context,
-                  title: "Success",
-                  content: val,
-                );
-              },
-              onError: (val) {
-                Navigator.pop(context);
-                Globals.showCustomDialog(
-                  context: context,
-                  title: "Something went wrong",
-                  content: val,
-                );
-              },
             );
-            // showModalBottomSheet(
-            //   context: context,
-            //   isScrollControlled: true,
-            //   backgroundColor: Colors.transparent,
-            //   barrierColor: Colors.transparent,
-            //   builder: (context) => StackCard(
-            //     child: const PaymentMain(),
-            //     title: "Payment",
-            //     onClose: () {
-            //       Navigator.pop(context);
-            //     },
-            //   ),
-            // );
           } else {
             Globals.showCustomDialog(
               context: context,
-              title: "Something went wrong",
+              title: "Oops",
               content: "Please select date and time",
             );
           }
         }
+      },
+    );
+  }
+
+  _createBooking(BookingProvider provider) async {
+    var userProvider = context.read<UserProvider>();
+    var userId = userProvider.currentUser!.id;
+    await provider.createBooking(
+      booking: Booking(
+        slots: selectedSlots!,
+        uid: userId!,
+        status: BookingStatus.pending,
+        toTime: toTime!,
+        fromTime: fromTime!,
+        fromDate: fromDate!,
+        areaId: widget.area.id!,
+      ),
+      onSuccess: (val) {
+        print('Booking Success');
+        Navigator.pop(context);
+        Globals.showCustomDialog(
+          context: context,
+          title: "Success",
+          content: val,
+        );
+      },
+      onError: (val) {
+        Navigator.pop(context);
+        Globals.showCustomDialog(
+          context: context,
+          title: "Something went wrong",
+          content: val,
+        );
       },
     );
   }
