@@ -122,12 +122,13 @@ class LoginPage extends StatelessWidget {
                                   }
                                 },
                                 onError: (val) {
+                                  Globals.showCustomDialog(context: context, title: "Error", content: val);
                                   log(val);
                                 },
                               );
                         },
                         onError: (val) {
-                          Globals.showCustomDialog(context: context, title: "Something went wrong", content: val);
+                          Globals.showCustomDialog(context: context, title: "Error", content: val);
                           log(val);
                         },
                       );
