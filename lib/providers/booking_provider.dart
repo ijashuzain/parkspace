@@ -53,7 +53,10 @@ class BookingProvider extends ChangeNotifier {
   }) async {
     _setUpdatingBooking(true);
     try {
-      await db.collection('bookings').doc(booking.id).set({"status": bookingStatus}, SetOptions(merge: true));
+      await db
+          .collection('bookings')
+          .doc(booking.id)
+          .set({"status": bookingStatus}, SetOptions(merge: true));
       allMyBookings.clear();
       currentBookings.clear();
       pastBookings.clear();
@@ -73,7 +76,10 @@ class BookingProvider extends ChangeNotifier {
     _setUpdatingBooking(true);
     try {
       var id = booking.id;
-      await db.collection('bookings').doc(id).set(booking.toMap(), SetOptions(merge: true));
+      await db
+          .collection('bookings')
+          .doc(id)
+          .set(booking.toMap(), SetOptions(merge: true));
       allMyBookings.clear();
       currentBookings.clear();
       pastBookings.clear();
@@ -86,13 +92,23 @@ class BookingProvider extends ChangeNotifier {
   }
 
   checkForCompletion(BuildContext context) async {
-    var res = await db.collection('bookings').where('status', isEqualTo: BookingStatus.confirmed).get();
+    var res = await db
+        .collection('bookings')
+        .where('status', isEqualTo: BookingStatus.confirmed)
+        .get();
     for (var element in res.docs) {
       Booking booking = Booking.fromJson(element.data());
-      DateTime date1 = Globals.formatStringToDateTime(booking.fromDate);
-      DateTime date2 = DateTime.now();
-      int difference = date2.difference(date1).inDays;
-      if (difference > 0) {
+      bool isPassed = false;
+      bool isDatePassed = _checkDatePassed(booking.fromDate);
+      if (!isDatePassed) {
+        bool isTimePassed = _checkTimePassed(booking.toTime);
+        if (isTimePassed) {
+          isPassed = true;
+        }
+      } else {
+        isPassed = true;
+      }
+      if (isPassed) {
         await updateBookingStatus(
           context: context,
           booking: booking,
@@ -132,14 +148,19 @@ class BookingProvider extends ChangeNotifier {
     try {
       var userProvider = context.read<UserProvider>();
       var userId = userProvider.currentUser!.id;
-      var bookingSnap = await db.collection('bookings').where('uid', isEqualTo: userId).get();
+      var bookingSnap =
+          await db.collection('bookings').where('uid', isEqualTo: userId).get();
       if (bookingSnap.docs.isNotEmpty) {
         allMyBookings = [];
         if (allMyBookings.isEmpty) {
           log("All bookings : ${allMyBookings.length}");
           for (var element in bookingSnap.docs) {
-            var area = await context.read<AreaProvider>().fetchSingleArea(element.data()['areaId']);
-            var usr = await context.read<UserProvider>().fetchUserById(uid: element.data()['uid']);
+            var area = await context
+                .read<AreaProvider>()
+                .fetchSingleArea(element.data()['areaId']);
+            var usr = await context
+                .read<UserProvider>()
+                .fetchUserById(uid: element.data()['uid']);
             if (area != null) {
               Booking booking = Booking(
                 slots: element.data()['slots'],
@@ -179,7 +200,8 @@ class BookingProvider extends ChangeNotifier {
     try {
       var userProvider = context.read<UserProvider>();
       var userId = userProvider.currentUser!.id;
-      List<Area> managerAreas = await context.read<AreaProvider>().fetchAllMyAreas(context);
+      List<Area> managerAreas =
+          await context.read<AreaProvider>().fetchAllMyAreas(context);
       if (managerAreas.isNotEmpty) {
         var bookingSnap = await db.collection('bookings').get();
         allManagerBookings = [];
@@ -187,10 +209,13 @@ class BookingProvider extends ChangeNotifier {
           for (var element in bookingSnap.docs) {
             for (var managerArea in managerAreas) {
               if (managerArea.id == element.data()['areaId']) {
-                var area = await context.read<AreaProvider>().fetchSingleArea(element.data()['areaId']);
-                var usr = await context.read<UserProvider>().fetchUserById(uid: element.data()['uid']);
+                var area = await context
+                    .read<AreaProvider>()
+                    .fetchSingleArea(element.data()['areaId']);
+                var usr = await context
+                    .read<UserProvider>()
+                    .fetchUserById(uid: element.data()['uid']);
                 if (area != null) {
-
                   Booking booking = Booking(
                     slots: element.data()['slots'],
                     user: usr,
@@ -204,25 +229,30 @@ class BookingProvider extends ChangeNotifier {
                     uid: element.data()['uid'],
                   );
 
-                  if(booking.status == BookingStatus.pending){
+                  if (booking.status == BookingStatus.pending) {
                     bool isPassed = false;
-                    bool isDatePassed = _checkDatePassed(element.data()['fromDate']);
-                    if(!isDatePassed){
-                      bool isTimePassed = _checkTimePassed(element.data()['toTime']);
-                      if(isTimePassed){
+                    bool isDatePassed =
+                        _checkDatePassed(element.data()['fromDate']);
+                    if (!isDatePassed) {
+                      bool isTimePassed =
+                          _checkTimePassed(element.data()['toTime']);
+                      if (isTimePassed) {
                         isPassed = true;
                       }
-                    }else{
+                    } else {
                       isPassed = true;
                     }
 
-                    if(isPassed){
-                      await deleteBooking(bookingId: element.id, onSuccess: (val){}, onError: (val){});
-                    }else{
+                    if (isPassed) {
+                      await deleteBooking(
+                          bookingId: element.id,
+                          onSuccess: (val) {},
+                          onError: (val) {});
+                    } else {
                       _addToManagerBookingList(booking);
                     }
-                  }else{
-                   _addToManagerBookingList(booking);
+                  } else {
+                    _addToManagerBookingList(booking);
                   }
                 }
               }
@@ -241,28 +271,28 @@ class BookingProvider extends ChangeNotifier {
     }
   }
 
-  _addToManagerBookingList(Booking booking){
+  _addToManagerBookingList(Booking booking) {
     allManagerBookings.add(booking);
     notifyListeners();
   }
 
-  bool _checkDatePassed(String dateString){
+  bool _checkDatePassed(String dateString) {
     DateTime date = Globals.formatStringToDateTime(dateString);
     int difference = date.difference(DateTime.now()).inDays;
-    if(difference < 0){
+    if (difference < 0) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
 
-  bool _checkTimePassed(String timeString){
+  bool _checkTimePassed(String timeString) {
     TimeOfDay time = Globals.formatStringToTimeOfDay(timeString);
     int differance = time.minute - TimeOfDay.now().minute;
     log("Time Difference : " + differance.toString());
-    if(differance < 0){
+    if (differance < 0) {
       return true;
-    }else{
+    } else {
       return false;
     }
   }
