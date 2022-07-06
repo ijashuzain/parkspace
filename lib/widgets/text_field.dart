@@ -5,10 +5,12 @@ import 'package:sizer/sizer.dart';
 class CTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
+  final bool isPassword;
+  final TextInputType type;
   const CTextField({
     Key? key,
     required this.controller,
-    required this.hint,
+    required this.hint, this.isPassword = false, this.type = TextInputType.text,
   }) : super(key: key);
 
   @override
@@ -17,6 +19,8 @@ class CTextField extends StatelessWidget {
       padding: EdgeInsets.only(top: 1.5.h,bottom: 1.5.h),
       child: TextFormField(
         controller: controller,
+        obscureText: isPassword,
+        keyboardType: type,
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: TextStyle(

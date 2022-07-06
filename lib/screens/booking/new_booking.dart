@@ -1,24 +1,16 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:parkspace/constants/colors.dart';
+import 'package:location/location.dart';
 import 'package:parkspace/models/area_model.dart';
 import 'package:parkspace/models/map_marker_model.dart';
 import 'package:parkspace/providers/area_provider.dart';
 import 'package:parkspace/providers/booking_provider.dart';
-import 'package:parkspace/screens/booking/widgets/area_card_widget.dart';
-import 'package:parkspace/screens/booking/widgets/area_data_widget.dart';
-import 'package:parkspace/screens/booking/widgets/area_slot_selector.dart';
 import 'package:parkspace/screens/booking/widgets/booking_widget.dart';
-import 'package:parkspace/screens/payment/payment_main.dart';
-import 'package:parkspace/utils/globals.dart';
-import 'package:parkspace/widgets/button.dart';
 import 'package:parkspace/widgets/stack_card.dart';
 import "package:sizer/sizer.dart";
 import 'package:provider/provider.dart';
 
-import '../../models/booking_model.dart';
-import '../../providers/user_provider.dart';
 
 class NewBooking extends StatefulWidget {
   const NewBooking({Key? key}) : super(key: key);
@@ -30,6 +22,8 @@ class NewBooking extends StatefulWidget {
 class _NewBookingState extends State<NewBooking> {
   //
   Set<Marker> markers = {};
+  Location location = Location();
+  LatLng currentLocation = const LatLng(0, 0);
 
   @override
   void initState() {
@@ -38,6 +32,8 @@ class _NewBookingState extends State<NewBooking> {
       List<MapMarker> mapMarkers = await context.read<AreaProvider>().getMarkers();
       _getMarkers(mapMarkers);
       log(mapMarkers.toString());
+      setState(() {
+      });
     });
     super.initState();
   }
@@ -96,8 +92,15 @@ class _NewBookingState extends State<NewBooking> {
               child: GestureDetector(
                 onTap: () {},
                 child: GoogleMap(
-                  initialCameraPosition: const CameraPosition(
-                    target: LatLng(0, 0),
+                  onMapCreated: (controller) async {
+                    log("Map Created");
+                    var locData = await location.getLocation();
+                    currentLocation = LatLng(locData.latitude!, locData.longitude!);
+                    controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: currentLocation,zoom: 10)));
+                  },
+                  myLocationEnabled: true,
+                  initialCameraPosition: CameraPosition(
+                    target: currentLocation,
                   ),
                   markers: markers,
                 ),

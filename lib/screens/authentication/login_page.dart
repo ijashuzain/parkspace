@@ -29,7 +29,9 @@ class LoginPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: kBackgroundColor,
       body: DoubleBackToCloseApp(
-        snackBar: const SnackBar(content: Text("Press back button again to close the app."),),
+        snackBar: const SnackBar(
+          content: Text("Press back button again to close the app."),
+        ),
         child: SizedBox(
           height: 100.h,
           width: 100.w,
@@ -48,6 +50,7 @@ class LoginPage extends StatelessWidget {
                       hint: "Username",
                     ),
                     CTextField(
+                      isPassword: true,
                       controller: passwordController,
                       hint: "Password",
                     ),
@@ -69,7 +72,8 @@ class LoginPage extends StatelessWidget {
                   isDisabled: provider.loggingIn,
                   title: "Login",
                   onTap: () async {
-                    if (usernameController.text == '' || passwordController.text == '') {
+                    if (usernameController.text == '' ||
+                        passwordController.text == '') {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
@@ -122,13 +126,17 @@ class LoginPage extends StatelessWidget {
                                   }
                                 },
                                 onError: (val) {
-                                  Globals.showCustomDialog(context: context, title: "Error", content: val);
+                                  Globals.showCustomDialog(
+                                      context: context,
+                                      title: "Error",
+                                      content: val);
                                   log(val);
                                 },
                               );
                         },
                         onError: (val) {
-                          Globals.showCustomDialog(context: context, title: "Error", content: val);
+                          Globals.showCustomDialog(
+                              context: context, title: "Error", content: val);
                           log(val);
                         },
                       );
@@ -162,15 +170,28 @@ class SignupText extends StatelessWidget {
           children: [
             TextSpan(
               text: "Don't you have registered yet ? ",
-              style: TextStyle(fontFamily: "Poppins", fontSize: 8.sp, color: kPrimaryColor, fontWeight: FontWeight.w400),
+              style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 8.sp,
+                  color: kPrimaryColor,
+                  fontWeight: FontWeight.w400),
             ),
             TextSpan(
               text: "Click here ",
-              style: TextStyle(fontFamily: "Poppins", fontSize: 8.sp, color: kSecondaryColor, fontWeight: FontWeight.w400, decoration: TextDecoration.underline),
+              style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 8.sp,
+                  color: kSecondaryColor,
+                  fontWeight: FontWeight.w400,
+                  decoration: TextDecoration.underline),
             ),
             TextSpan(
               text: "to Signup now. ",
-              style: TextStyle(fontFamily: "Poppins", fontSize: 8.sp, color: kPrimaryColor, fontWeight: FontWeight.w400),
+              style: TextStyle(
+                  fontFamily: "Poppins",
+                  fontSize: 8.sp,
+                  color: kPrimaryColor,
+                  fontWeight: FontWeight.w400),
             ),
           ],
         ),

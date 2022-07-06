@@ -5,6 +5,7 @@ import 'package:parkspace/constants/colors.dart';
 import 'package:parkspace/models/user_data.dart';
 import 'package:parkspace/providers/auth_provider.dart';
 import 'package:parkspace/providers/user_provider.dart';
+import 'package:parkspace/screens/manager/manager_home.dart';
 import 'package:parkspace/utils/globals.dart';
 import 'package:provider/provider.dart';
 import 'package:parkspace/screens/home/home_main.dart';
@@ -12,6 +13,8 @@ import 'package:parkspace/widgets/auth_title.dart';
 import 'package:parkspace/widgets/button.dart';
 import 'package:parkspace/widgets/text_field.dart';
 import 'package:sizer/sizer.dart';
+
+import '../../providers/booking_provider.dart';
 
 class SignupPage extends StatefulWidget {
   static String routeName = "/signup_page";
@@ -147,7 +150,10 @@ class _SignupPageState extends State<SignupPage> {
                   isLoading: provider.signingUp,
                   title: "Signup",
                   onTap: () async {
-                    if (nameController.text == '' || emailController.text == '' || phoneController.text == '' || passwordController.text == '') {
+                    if (nameController.text == '' ||
+                        emailController.text == '' ||
+                        phoneController.text == '' ||
+                        passwordController.text == '') {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
@@ -192,21 +198,30 @@ class _SignupPageState extends State<SignupPage> {
                           await context.read<UserProvider>().fetchUser(
                                 userId: val,
                                 onSuccess: (val) async {
-
-                                  Navigator.pushNamedAndRemoveUntil(
-                                    context,
-                                    HomePage.routeName,
-                                    ((route) => false),
-                                  );
+                                  if (val.type == "CUSTOMER") {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      HomePage.routeName,
+                                      ((route) => false),
+                                    );
+                                  } else {
+                                    Navigator.pushNamedAndRemoveUntil(
+                                      context,
+                                      ManagerHome.routeName,
+                                      ((route) => false),
+                                    );
+                                  }
                                 },
                                 onError: (val) {
-
                                   log(val);
                                 },
                               );
                         },
                         onError: (val) {
-                          Globals.showCustomDialog(context: context, title: "Something went wrong", content: val);
+                          Globals.showCustomDialog(
+                              context: context,
+                              title: "Something went wrong",
+                              content: val);
                           log(val);
                         },
                       );

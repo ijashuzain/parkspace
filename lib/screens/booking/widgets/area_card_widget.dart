@@ -40,7 +40,7 @@ class AreaDetailCard extends StatelessWidget {
               children: [
                 const Spacer(),
                 AreaData(
-                  title: "Available Slots",
+                  title: "Total Slots",
                   value: availableSlots,
                   width: 35.w,
                 ),

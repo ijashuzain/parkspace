@@ -130,7 +130,11 @@ class _BookingWidgetState extends State<BookingWidget> {
         SizedBox(height: 2.h),
         Consumer<BookingProvider>(builder: (context, provider, child) {
           if (widget.isEdit) {
-            return _editControls(provider);
+            if(widget.booking!.status == BookingStatus.confirmed || widget.booking!.status == BookingStatus.completed){
+              return _deleteControls(provider);
+            }else{
+              return _editControls(provider);
+            }
           } else {
             if (widget.isManage) {
               if (widget.booking!.status == BookingStatus.pending) {
@@ -286,7 +290,7 @@ class _BookingWidgetState extends State<BookingWidget> {
       booking: Booking(
         slots: selectedSlots!,
         uid: userId!,
-        status: BookingStatus.pending,
+        status: BookingStatus.confirmed,
         toTime: toTime!,
         fromTime: fromTime!,
         fromDate: fromDate!,
@@ -295,6 +299,11 @@ class _BookingWidgetState extends State<BookingWidget> {
       onSuccess: (val) {
         print('Booking Success');
         Navigator.pop(context);
+        context.read<BookingProvider>().fetchAllMyBookings(
+              context: context,
+              onSuccess: (val),
+              onError: (val),
+            );
         Globals.showCustomDialog(
           context: context,
           title: "Success",

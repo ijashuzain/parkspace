@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/material.dart';
 import 'package:parkspace/models/area_model.dart';
 import 'package:parkspace/providers/area_provider.dart';
 import 'package:parkspace/utils/globals.dart';
@@ -189,6 +190,7 @@ class BookingProvider extends ChangeNotifier {
                 var area = await context.read<AreaProvider>().fetchSingleArea(element.data()['areaId']);
                 var usr = await context.read<UserProvider>().fetchUserById(uid: element.data()['uid']);
                 if (area != null) {
+
                   Booking booking = Booking(
                     slots: element.data()['slots'],
                     user: usr,
@@ -201,14 +203,34 @@ class BookingProvider extends ChangeNotifier {
                     status: element.data()['status'],
                     uid: element.data()['uid'],
                   );
-                  allManagerBookings.add(booking);
+
+                  if(booking.status == BookingStatus.pending){
+                    bool isPassed = false;
+                    bool isDatePassed = _checkDatePassed(element.data()['fromDate']);
+                    if(!isDatePassed){
+                      bool isTimePassed = _checkTimePassed(element.data()['toTime']);
+                      if(isTimePassed){
+                        isPassed = true;
+                      }
+                    }else{
+                      isPassed = true;
+                    }
+
+                    if(isPassed){
+                      await deleteBooking(bookingId: element.id, onSuccess: (val){}, onError: (val){});
+                    }else{
+                      _addToManagerBookingList(booking);
+                    }
+                  }else{
+                   _addToManagerBookingList(booking);
+                  }
                 }
               }
             }
           }
         }
       } else {
-        allMyBookings = [];
+        allManagerBookings = [];
         notifyListeners();
       }
       _setManagerBookingFetchingStatus(false);
@@ -216,6 +238,32 @@ class BookingProvider extends ChangeNotifier {
     } catch (e) {
       _setManagerBookingFetchingStatus(false);
       onError(e);
+    }
+  }
+
+  _addToManagerBookingList(Booking booking){
+    allManagerBookings.add(booking);
+    notifyListeners();
+  }
+
+  bool _checkDatePassed(String dateString){
+    DateTime date = Globals.formatStringToDateTime(dateString);
+    int difference = date.difference(DateTime.now()).inDays;
+    if(difference < 0){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  bool _checkTimePassed(String timeString){
+    TimeOfDay time = Globals.formatStringToTimeOfDay(timeString);
+    int differance = time.minute - TimeOfDay.now().minute;
+    log("Time Difference : " + differance.toString());
+    if(differance < 0){
+      return true;
+    }else{
+      return false;
     }
   }
 

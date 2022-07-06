@@ -13,17 +13,17 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
 
     if (homeNavigation == HomeNavigation.myBooking) {
-      await context.read<BookingProvider>().checkForCompletion(context);
-      context.read<BookingProvider>().fetchAllMyBookings(
-            context: context,
-            onSuccess: (val) {
-              log(val.toString());
-            },
-            onError: (val) {
-              log(val.toString());
-            },
-          );
-      notifyListeners();
+      // await context.read<BookingProvider>().checkForCompletion(context);
+      // context.read<BookingProvider>().fetchAllMyBookings(
+      //       context: context,
+      //       onSuccess: (val) {
+      //         log(val.toString());
+      //       },
+      //       onError: (val) {
+      //         log(val.toString());
+      //       },
+      //     );
+      // notifyListeners();
     }
   }
 
@@ -35,16 +35,16 @@ class HomeProvider extends ChangeNotifier {
     notifyListeners();
 
     if (managerNav == HomeNavigation.managerBookings) {
-      await context.read<BookingProvider>().checkForCompletion(context);
-      context.read<BookingProvider>().fetchAllManagerBookings(
-            context: context,
-            onSuccess: (val) {
-              log("Manager Booking Fetched");
-            },
-            onError: (val) {
-              log(val.toString());
-            },
-          );
+      // await context.read<BookingProvider>().checkForCompletion(context);
+      // context.read<BookingProvider>().fetchAllManagerBookings(
+      //       context: context,
+      //       onSuccess: (val) {
+      //         log("Manager Booking Fetched");
+      //       },
+      //       onError: (val) {
+      //         log(val.toString());
+      //       },
+      //     );
     }
   }
 }

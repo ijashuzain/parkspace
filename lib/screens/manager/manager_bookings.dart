@@ -22,6 +22,19 @@ class ManagerBookings extends StatefulWidget {
 class _ManagerBookingsState extends State<ManagerBookings> {
   @override
   void initState() {
+    WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      await context.read<BookingProvider>().checkForCompletion(context);
+      context.read<BookingProvider>().fetchAllManagerBookings(
+            context: context,
+            onSuccess: (val) {
+              log(val.toString());
+            },
+            onError: (val) {
+              log(val.toString());
+            },
+          );
+      setState(() {});
+    });
     super.initState();
   }
 
