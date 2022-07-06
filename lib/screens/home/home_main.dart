@@ -27,17 +27,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
-      await context.read<BookingProvider>().checkForCompletion(context);
-      context.read<BookingProvider>().fetchAllMyBookings(
-            context: context,
-            onSuccess: (val) {
-              log(val.toString());
-            },
-            onError: (val) {
-              log(val.toString());
-            },
-          );
-      setState(() {});
+
     });
     super.initState();
   }
