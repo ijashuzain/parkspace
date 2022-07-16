@@ -39,6 +39,7 @@ class _BookingWidgetState extends State<BookingWidget> {
   String? fromDate;
   String? fromTime;
   String? toTime;
+  bool slotChecking = false;
   bool locked = false;
   int? selectedSlots;
   int slotCount = 0;
@@ -55,6 +56,9 @@ class _BookingWidgetState extends State<BookingWidget> {
     }
 
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
+      setState(() {
+        slotChecking = true;
+      });
       int slots =
           await context.read<AreaProvider>().getBookedSlots(widget.area.id!);
       slotCount = slots;
@@ -62,7 +66,9 @@ class _BookingWidgetState extends State<BookingWidget> {
         locked = true;
       }
       slotsMenu = _generateSlotsMenu(widget.area.slots - slotCount);
-      setState(() {});
+      setState(() {
+        slotChecking = false;
+      });
     });
 
     super.initState();
@@ -92,18 +98,6 @@ class _BookingWidgetState extends State<BookingWidget> {
           ratePerHour: widget.area.rate.toString(),
         ),
         SizedBox(height: 2.h),
-        SlotSelector(
-          menuList: slotsMenu,
-          locked: locked,
-          selectedSlotValue: selectedSlots!,
-          totalSlots: widget.area.slots - slotCount,
-          onSelected: (val) {
-            setState(() {
-              selectedSlots = val;
-            });
-          },
-        ),
-        SizedBox(height: 2.h),
         AreaDateTimePicker(
           fromDate: fromDate,
           fromTime: fromTime,
@@ -125,14 +119,31 @@ class _BookingWidgetState extends State<BookingWidget> {
             setState(() {
               toTime = val;
             });
+            if (fromDate != null && fromTime != null && toTime != null) {
+              _checkSlotsByDateAndTime();
+            }
+          },
+        ),
+        SizedBox(height: 2.h),
+        SlotSelector(
+          isLoading: slotChecking,
+          menuList: slotsMenu,
+          locked: locked,
+          selectedSlotValue: selectedSlots!,
+          totalSlots: widget.area.slots - slotCount,
+          onSelected: (val) {
+            setState(() {
+              selectedSlots = val;
+            });
           },
         ),
         SizedBox(height: 2.h),
         Consumer<BookingProvider>(builder: (context, provider, child) {
           if (widget.isEdit) {
-            if(widget.booking!.status == BookingStatus.confirmed || widget.booking!.status == BookingStatus.completed){
+            if (widget.booking!.status == BookingStatus.confirmed ||
+                widget.booking!.status == BookingStatus.completed) {
               return _deleteControls(provider);
-            }else{
+            } else {
               return _editControls(provider);
             }
           } else {
@@ -151,6 +162,22 @@ class _BookingWidgetState extends State<BookingWidget> {
         })
       ],
     );
+  }
+
+  _checkSlotsByDateAndTime() async {
+    setState(() {
+      slotChecking = true;
+    });
+    int slots = await context.read<AreaProvider>().getBookedSlotsByDateAndTime(
+        widget.area.id!, fromDate!, fromTime!, toTime!);
+    slotCount = slots;
+    if (slotCount >= widget.area.slots) {
+      locked = true;
+    }
+    slotsMenu = _generateSlotsMenu(widget.area.slots - slotCount);
+    setState(() {
+      slotChecking = false;
+    });
   }
 
   _deleteAndCompleteControls(BookingProvider provider) {
@@ -243,7 +270,7 @@ class _BookingWidgetState extends State<BookingWidget> {
             content: "There are no slots left",
           );
         } else {
-          if (fromTime != null || toTime != null || fromDate != null) {
+          if (fromTime != null && toTime != null && fromDate != null) {
             showModalBottomSheet(
               context: context,
               isScrollControlled: true,
@@ -301,8 +328,8 @@ class _BookingWidgetState extends State<BookingWidget> {
         Navigator.pop(context);
         context.read<BookingProvider>().fetchAllMyBookings(
               context: context,
-              onSuccess: (val),
-              onError: (val),
+              onSuccess: (val) {},
+              onError: (val) {},
             );
         Globals.showCustomDialog(
           context: context,

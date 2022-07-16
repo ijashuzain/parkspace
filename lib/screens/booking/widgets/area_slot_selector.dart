@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:parkspace/constants/colors.dart';
 import 'package:sizer/sizer.dart';
@@ -8,12 +9,15 @@ class SlotSelector extends StatefulWidget {
   final Function onSelected;
   final bool locked;
   final List<DropdownMenuItem<int>> menuList;
+  final bool isLoading;
   const SlotSelector({
     Key? key,
     required this.selectedSlotValue,
     required this.totalSlots,
     required this.onSelected,
-    required this.locked, required this.menuList,
+    required this.locked,
+    required this.menuList,
+    this.isLoading = false,
   }) : super(key: key);
 
   @override
@@ -38,33 +42,46 @@ class _SlotSelectorState extends State<SlotSelector> {
       ),
       child: Padding(
         padding: EdgeInsets.all(3.w),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(height: 1.h),
-            Text(
-              "Selected Slots",
-              style: TextStyle(
-                fontFamily: "Poppins",
-                fontSize: 10.sp,
-                color: kPrimaryColor,
-                fontWeight: FontWeight.w500,
+        child: widget.isLoading
+            ? Padding(
+                padding: EdgeInsets.only(top: 5.h, bottom: 5.h),
+                child: Row(
+                  children: const [
+                    Text("Checking for slots..."),
+                    Spacer(),
+                    CupertinoActivityIndicator()
+                  ],
+                ),
+              )
+            : Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 1.h),
+                  Text(
+                    "Selected Slots",
+                    style: TextStyle(
+                      fontFamily: "Poppins",
+                      fontSize: 10.sp,
+                      color: kPrimaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  DropdownButton<int>(
+                    isExpanded: true,
+                    hint: Text(widget.locked
+                        ? "There is no slots left"
+                        : "Select Slots"),
+                    borderRadius: const BorderRadius.all(Radius.circular(12)),
+                    underline: const SizedBox(),
+                    value: widget.locked ? null : widget.selectedSlotValue,
+                    items: widget.locked ? [] : widget.menuList,
+                    onChanged: (val) {
+                      widget.onSelected(int.parse(val.toString()));
+                    },
+                  )
+                ],
               ),
-            ),
-            DropdownButton<int>(
-              isExpanded: true,
-              hint:  Text(widget.locked ? "There is no slots left" : "Select Slots"),
-              borderRadius: const BorderRadius.all(Radius.circular(12)),
-              underline: const SizedBox(),
-              value: widget.locked ? null : widget.selectedSlotValue,
-              items: widget.locked ? [] : widget.menuList,
-              onChanged: (val) {
-                widget.onSelected(int.parse(val.toString()));
-              },
-            )
-          ],
-        ),
       ),
     );
   }

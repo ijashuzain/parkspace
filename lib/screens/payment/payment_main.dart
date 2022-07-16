@@ -12,7 +12,7 @@ class PaymentMain extends StatefulWidget {
   final Function onSuccess;
   final Function onError;
 
-  PaymentMain({
+  const PaymentMain({
     Key? key,
     required this.amount,
     required this.product,

@@ -100,6 +100,7 @@ class BookingProvider extends ChangeNotifier {
       Booking booking = Booking.fromJson(element.data());
       bool isPassed = false;
       bool isDatePassed = _checkDatePassed(booking.fromDate);
+      log("Is Date Passed : $isDatePassed");
       if (!isDatePassed) {
         bool isTimePassed = _checkTimePassed(booking.toTime);
         if (isTimePassed) {
@@ -288,7 +289,8 @@ class BookingProvider extends ChangeNotifier {
 
   bool _checkTimePassed(String timeString) {
     TimeOfDay time = Globals.formatStringToTimeOfDay(timeString);
-    int differance = time.minute - TimeOfDay.now().minute;
+    double toDouble(time) => time.hour + time.minute/60.0;
+    var differance = toDouble(time) - toDouble(TimeOfDay.now());
     log("Time Difference : " + differance.toString());
     if (differance < 0) {
       return true;

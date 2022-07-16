@@ -2,11 +2,13 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:parkspace/models/area_model.dart';
 import 'package:parkspace/models/booking_model.dart';
 import 'package:parkspace/models/map_marker_model.dart';
 import 'package:parkspace/providers/user_provider.dart';
+import 'package:parkspace/utils/globals.dart';
 import 'package:parkspace/utils/statuses.dart';
 import 'package:provider/provider.dart';
 
@@ -41,24 +43,69 @@ class AreaProvider extends ChangeNotifier {
     }
   }
 
-  updateSlotArea({required String areaId,required int bookedSlots}) async {
-    try{
-      await db.collection("areas").doc(areaId).set({"bookedSlots" : bookedSlots},SetOptions(merge: true));
-    }catch (e){
+  updateSlotArea({required String areaId, required int bookedSlots}) async {
+    try {
+      await db
+          .collection("areas")
+          .doc(areaId)
+          .set({"bookedSlots": bookedSlots}, SetOptions(merge: true));
+    } catch (e) {
       log("Error while updating slot : $e");
     }
   }
-  
+
   Future<int> getBookedSlots(String areaId) async {
-    var res = await db.collection('bookings').where('areaId',isEqualTo: areaId).where('status',isEqualTo: BookingStatus.confirmed).get();
+    var res = await db
+        .collection('bookings')
+        .where('areaId', isEqualTo: areaId)
+        .where('status', isEqualTo: BookingStatus.confirmed)
+        .get();
     int bookedSlots = 0;
-    if(res.docs.isNotEmpty){
-      for (var element in res.docs) { 
+    if (res.docs.isNotEmpty) {
+      for (var element in res.docs) {
         Booking booking = Booking.fromJson(element.data());
         bookedSlots = bookedSlots + booking.slots;
       }
     }
     return bookedSlots;
+  }
+
+  Future<int> getBookedSlotsByDateAndTime(
+      String areaId, String fromDate, String fromTime, String toTime) async {
+    var res = await db
+        .collection('bookings')
+        .where('areaId', isEqualTo: areaId)
+        .where('status', isEqualTo: BookingStatus.confirmed)
+        .get();
+    int bookedSlots = 0;
+    if (res.docs.isNotEmpty) {
+      for (var element in res.docs) {
+        Booking booking = Booking.fromJson(element.data());
+        if (booking.fromDate == fromDate) {
+          if (!_checkTimePassed(fromTime, booking.fromTime) &&
+              _checkTimePassed(fromTime, booking.toTime)) {
+            if (!_checkTimePassed(toTime, booking.fromTime) &&
+                _checkTimePassed(toTime, booking.toTime)) {
+              bookedSlots = bookedSlots + booking.slots;
+            }
+          }
+        }
+      }
+    }
+    return bookedSlots;
+  }
+
+  bool _checkTimePassed(String firstTimeString, String secondTimeString) {
+    TimeOfDay firstTime = Globals.formatStringToTimeOfDay(firstTimeString);
+    TimeOfDay secondTime = Globals.formatStringToTimeOfDay(secondTimeString);
+    double toDouble(time) => time.hour + time.minute / 60.0;
+    var differance = toDouble(firstTime) - toDouble(secondTime);
+    log("Time Difference : " + differance.toString());
+    if (differance < 0) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   updateArea({
@@ -127,7 +174,8 @@ class AreaProvider extends ChangeNotifier {
     try {
       var userProvider = context.read<UserProvider>();
       var userId = userProvider.currentUser!.id;
-      var areaSnap = await db.collection("areas").where('uid', isEqualTo: userId).get();
+      var areaSnap =
+          await db.collection("areas").where('uid', isEqualTo: userId).get();
       myAreas = [];
       for (var element in areaSnap.docs) {
         Area area = Area.fromJson(element.data());
