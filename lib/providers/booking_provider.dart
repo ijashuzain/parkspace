@@ -92,6 +92,7 @@ class BookingProvider extends ChangeNotifier {
   }
 
   checkForCompletion(BuildContext context) async {
+    log("Checking for completetion");
     var res = await db
         .collection('bookings')
         .where('status', isEqualTo: BookingStatus.confirmed)
@@ -142,9 +143,8 @@ class BookingProvider extends ChangeNotifier {
 
   fetchAllMyBookings({
     required BuildContext context,
-    required Function onSuccess,
-    required Function onError,
   }) async {
+    log("Fetching my bookings");
     _setMyBookingFetchingStatus(true);
     try {
       var userProvider = context.read<UserProvider>();
@@ -185,10 +185,8 @@ class BookingProvider extends ChangeNotifier {
         notifyListeners();
       }
       _setMyBookingFetchingStatus(false);
-      onSuccess("Success");
     } catch (e) {
       _setMyBookingFetchingStatus(false);
-      onError(e);
     }
   }
 
@@ -280,6 +278,7 @@ class BookingProvider extends ChangeNotifier {
   bool _checkDatePassed(String dateString) {
     DateTime date = Globals.formatStringToDateTime(dateString);
     int difference = date.difference(DateTime.now()).inDays;
+    log("Date Difference : $difference");
     if (difference < 0) {
       return true;
     } else {
@@ -289,7 +288,7 @@ class BookingProvider extends ChangeNotifier {
 
   bool _checkTimePassed(String timeString) {
     TimeOfDay time = Globals.formatStringToTimeOfDay(timeString);
-    double toDouble(time) => time.hour + time.minute/60.0;
+    double toDouble(time) => time.hour + time.minute / 60.0;
     var differance = toDouble(time) - toDouble(TimeOfDay.now());
     log("Time Difference : " + differance.toString());
     if (differance < 0) {

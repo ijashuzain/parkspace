@@ -33,13 +33,7 @@ class _HomeBookingsState extends State<HomeBookings> {
     WidgetsBinding.instance!.addPostFrameCallback((timeStamp) async {
       await context.read<BookingProvider>().checkForCompletion(context);
       context.read<BookingProvider>().fetchAllMyBookings(
-            context: context,
-            onSuccess: (val) {
-              log(val.toString());
-            },
-            onError: (val) {
-              log(val.toString());
-            },
+            context: context
           );
       setState(() {});
     });
@@ -71,9 +65,7 @@ class _HomeBookingsState extends State<HomeBookings> {
                 IconButton(
                   onPressed: () {
                     provider.fetchAllMyBookings(
-                        context: context,
-                        onSuccess: (val) {},
-                        onError: (val) {});
+                        context: context);
                   },
                   icon: const Icon(Icons.refresh),
                 )
@@ -127,7 +119,7 @@ class _HomeBookingsState extends State<HomeBookings> {
             IconButton(
               onPressed: () {
                 context.read<BookingProvider>().fetchAllMyBookings(
-                    context: context, onSuccess: (val) {}, onError: (val) {});
+                    context: context);
               },
               icon: const Icon(Icons.refresh),
             )

@@ -210,8 +210,6 @@ class _BookingWidgetState extends State<BookingWidget> {
                 Navigator.pop(context);
                 provider.fetchAllMyBookings(
                   context: context,
-                  onError: (val) {},
-                  onSuccess: (val) {},
                 );
                 Globals.showCustomDialog(
                   context: context,
@@ -328,8 +326,6 @@ class _BookingWidgetState extends State<BookingWidget> {
         Navigator.pop(context);
         context.read<BookingProvider>().fetchAllMyBookings(
               context: context,
-              onSuccess: (val) {},
-              onError: (val) {},
             );
         Globals.showCustomDialog(
           context: context,
@@ -385,8 +381,6 @@ class _BookingWidgetState extends State<BookingWidget> {
                   Navigator.pop(context);
                   provider.fetchAllMyBookings(
                     context: context,
-                    onError: (val) {},
-                    onSuccess: (val) {},
                   );
                   Globals.showCustomDialog(
                     context: context,
@@ -493,8 +487,6 @@ class _BookingWidgetState extends State<BookingWidget> {
                 Navigator.pop(context);
                 provider.fetchAllMyBookings(
                   context: context,
-                  onError: (val) {},
-                  onSuccess: (val) {},
                 );
                 Globals.showCustomDialog(
                   context: context,
@@ -506,8 +498,6 @@ class _BookingWidgetState extends State<BookingWidget> {
                 Navigator.pop(context);
                 provider.fetchAllMyBookings(
                   context: context,
-                  onError: (val) {},
-                  onSuccess: (val) {},
                 );
                 Globals.showCustomDialog(
                   context: context,
@@ -529,8 +519,6 @@ class _BookingWidgetState extends State<BookingWidget> {
                 Navigator.pop(context);
                 provider.fetchAllMyBookings(
                   context: context,
-                  onError: (val) {},
-                  onSuccess: (val) {},
                 );
                 Globals.showCustomDialog(
                   context: context,
